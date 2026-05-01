@@ -827,7 +827,7 @@ const PROSPECTIVE_SCHOOLS = [
     website:'https://www.pingry.org', active:78, prev:65, target:100, history:[41,53,61,78],
     admin:[{name:'Mr. David Walsh', title:'Upper School Dean', email:'d.walsh@pingry.org', phone:'(973) 555-0117'}],
     users:[
-      {name:'Alex Johnson',     handle:'@alexj',          sessions:12, streak:15, score:92, grade:11},
+      {name:'Alex Johnson',     handle:'@alexj',          sessions:12, streak:15, score:92, grade:9},
       {name:'Mia Thompson',     handle:'@mia_t',          sessions:10, streak:11, score:85, grade:12},
       {name:'Ethan Davis',      handle:'@ethandavis',     sessions:8,  streak:8,  score:77, grade:11},
       {name:'Olivia White',     handle:'@owhite22',       sessions:6,  streak:6,  score:69, grade:10},
@@ -1869,7 +1869,7 @@ function renderAmbassadors(filter) {
       <div class="amb-row-meta">${user.grade ? 'Grade '+user.grade : ''} · ${user.handle}</div>
       <div class="amb-row-school">${school.name} <span style="color:var(--text-tertiary);font-size:11px">${school.city}, ${school.state}</span></div>
       <div>${badge}</div>
-      <button class="amb-contact-btn" onclick="event.stopPropagation()" title="Contact ${user.name}">✉ Contact</button>
+      <button class="amb-contact-btn" onclick="event.stopPropagation();logContact('${user.name}')" title="Contact ${user.name}">✉ Contact</button>
     </div>`;
   }).join('');
 
@@ -1897,6 +1897,18 @@ function renderAmbassadors(filter) {
       <button onclick="renderAmbassadors('candidates')" class="amb-filter-btn ${filter==='candidates'?'active':''}">Candidates (${candidates.length})</button>
     </div>
     <div class="amb-list">${rowHTML || '<div style="color:var(--text-tertiary);font-size:13px;padding:16px">No results.</div>'}</div>`;
+}
+
+function logContact(name) {
+  const existing = document.getElementById('contact-toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = 'contact-toast';
+  t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap';
+  t.textContent = `Outreach logged for ${name}`;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.style.opacity = '1');
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 250); }, 2500);
 }
 
 function toggleAmbStat(id) {
