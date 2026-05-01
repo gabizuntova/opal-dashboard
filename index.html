@@ -407,6 +407,19 @@ header {
   align-self: center;
 }
 .amb-contact-btn:hover { border-color: var(--text); color: var(--text); background: var(--bg); }
+.amb-list { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+.amb-row { display:grid; grid-template-columns:28px 160px 160px 1fr auto auto; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.1s; }
+.amb-row:last-child { border-bottom:none; }
+.amb-row:hover { background:var(--bg); }
+.amb-row-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; flex-shrink:0; }
+.amb-row-avatar.ambassador { background:var(--amber); }
+.amb-row-avatar.candidate { background:#9CA3AF; }
+.amb-row-name { font-size:13px; font-weight:600; }
+.amb-row-meta { font-size:11px; color:var(--text-tertiary); }
+.amb-row-school { font-size:12px; color:var(--text-secondary); }
+.amb-filter-btn { padding:6px 14px; border-radius:6px; border:1px solid var(--border); background:none; font-family:inherit; font-size:12px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:all 0.15s; }
+.amb-filter-btn.active { background:var(--text); color:white; border-color:var(--text); }
+.amb-filter-btn:hover:not(.active) { border-color:var(--text); color:var(--text); }
 
 @media print {
   body > *:not(#pitch-modal) { display: none !important; }
@@ -626,7 +639,7 @@ header {
     <div style="font-size:13px;font-weight:500;color:var(--text-tertiary);letter-spacing:0.3px;margin-bottom:10px">Welcome to the</div>
     <div style="font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1.15;margin-bottom:28px">Opal School Partnership Dashboard</div>
     <div style="font-size:15px;color:var(--text-secondary);margin-bottom:48px" id="overview-week-label">Here is what our customer success + sales pipeline looks like this week:</div>
-    <div class="stats-bar" id="overview-stats" style="justify-content:center"></div>
+    <div id="overview-stats" style="display:flex;flex-direction:column;gap:16px;margin-bottom:24px"></div>
   </div>
 </div>
 
@@ -1828,102 +1841,55 @@ function openPitchCard(schoolId, event) {
 // AMBASSADOR TAB
 // ══════════════════════════════════════════════════════════════
 
-function renderAmbassadors() {
-  const confirmedHTML = PARTNER_SCHOOLS.map(s => {
-    const u = s.users[0];
-    return `<div class="amb-card confirmed" onclick="openProfile('${s.id}',0)">
-      <div class="amb-avatar confirmed">${u.name[0]}</div>
-      <div class="amb-info">
-        <div class="amb-name">${u.name} <span class="badge badge-ambassador">Ambassador</span></div>
-        <div class="amb-handle">${u.handle} ${u.grade ? `<span style="color:var(--text-tertiary);font-size:11px">· Grade ${u.grade}</span>` : ''}</div>
-        <div class="amb-school">${s.name} · ${s.city}, ${s.state}</div>
-      </div>
-      <div class="amb-metrics">
-        <div class="amb-metric"><div class="amb-metric-val">${u.score}</div><div class="amb-metric-lbl">Score</div></div>
-        <div class="amb-metric"><div class="amb-metric-val">${u.streak}w</div><div class="amb-metric-lbl">Streak</div></div>
-        <div class="amb-metric"><div class="amb-metric-val">${u.sessions}</div><div class="amb-metric-lbl">Sessions</div></div>
-      </div>
-      <button class="amb-contact-btn" onclick="event.stopPropagation()" title="Contact ${u.name}">✉ Contact</button>
-    </div>`;
-  }).join('');
-
-  const candidatesHTML = PROSPECTIVE_SCHOOLS.map(s => {
-    const u = s.users[0];
-    const wd = getWeekData(s);
-    const status = prospectiveStatus(wd.active);
-    return `<div class="amb-card candidate" onclick="openProfile('${s.id}',0)">
-      <div class="amb-avatar candidate">${u.name[0]}</div>
-      <div class="amb-info">
-        <div class="amb-name">${u.name} <span class="badge" style="background:#DBEAFE;color:#1D4ED8;font-size:9px">Candidate</span></div>
-        <div class="amb-handle">${u.handle} ${u.grade ? `<span style="color:var(--text-tertiary);font-size:11px">· Grade ${u.grade}</span>` : ''}</div>
-        <div class="amb-school">${s.name} · ${s.city}, ${s.state} &nbsp;<span class="badge badge-${status}" style="font-size:9px">${STATUS_LABELS[status]}</span></div>
-      </div>
-      <div class="amb-metrics">
-        <div class="amb-metric"><div class="amb-metric-val">${u.score}</div><div class="amb-metric-lbl">Score</div></div>
-        <div class="amb-metric"><div class="amb-metric-val">${u.streak}w</div><div class="amb-metric-lbl">Streak</div></div>
-        <div class="amb-metric"><div class="amb-metric-val">${u.sessions}</div><div class="amb-metric-lbl">Sessions</div></div>
-      </div>
-      <button class="amb-contact-btn" onclick="event.stopPropagation()" title="Contact ${u.name}">✉ Contact</button>
-    </div>`;
-  }).join('');
-
+function renderAmbassadors(filter) {
+  if (!filter) filter = 'all';
   const readyCount = PROSPECTIVE_SCHOOLS.filter(s => prospectiveStatus(getWeekData(s).active) === 'ready').length;
-  const readySchools = PROSPECTIVE_SCHOOLS.filter(s => prospectiveStatus(getWeekData(s).active) === 'ready');
+  const statusOrder = {ready:0, close:1, 'not-ready':2};
+  const ambassadors = PARTNER_SCHOOLS.map(s => ({type:'ambassador', school:s, user:s.users[0], status:'ambassador'}));
+  const candidates = PROSPECTIVE_SCHOOLS.map(s => ({
+    type:'candidate', school:s, user:s.users[0], status:prospectiveStatus(getWeekData(s).active)
+  })).sort((a,b) => (statusOrder[a.status]||9) - (statusOrder[b.status]||9));
+  const all = [...ambassadors, ...candidates];
+  const filtered = filter==='ambassadors' ? ambassadors : filter==='candidates' ? candidates : all;
 
-  const confirmedListHTML = PARTNER_SCHOOLS.map(s => {
-    const u = s.users[0];
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
-      <span style="font-weight:500">${u.name}</span>
-      <span style="color:var(--text-tertiary)">${s.name}</span>
+  const rowHTML = filtered.map(({type, school, user, status}) => {
+    const badge = type==='ambassador'
+      ? `<span class="badge badge-ambassador" style="font-size:9px">Ambassador</span>`
+      : `<span class="badge badge-${status}" style="font-size:9px">${STATUS_LABELS[status]}</span>`;
+    return `<div class="amb-row" onclick="openProfile('${school.id}',0)">
+      <div class="amb-row-avatar ${type}">${user.name[0]}</div>
+      <div class="amb-row-name">${user.name}</div>
+      <div class="amb-row-meta">${user.grade ? 'Grade '+user.grade : ''} · ${user.handle}</div>
+      <div class="amb-row-school">${school.name} <span style="color:var(--text-tertiary);font-size:11px">${school.city}, ${school.state}</span></div>
+      <div>${badge}</div>
+      <button class="amb-contact-btn" onclick="event.stopPropagation()" title="Contact ${user.name}">✉ Contact</button>
     </div>`;
   }).join('');
-
-  const candidateListHTML = PROSPECTIVE_SCHOOLS.map(s => {
-    const u = s.users[0];
-    const status = prospectiveStatus(getWeekData(s).active);
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
-      <span style="font-weight:500">${u.name}</span>
-      <span style="color:var(--text-tertiary)">${s.name} &nbsp;<span class="badge badge-${status}" style="font-size:9px">${STATUS_LABELS[status]}</span></span>
-    </div>`;
-  }).join('');
-
-  const readyListHTML = readySchools.length ? readySchools.map(s => {
-    const candidate = s.users[0];
-    return `<div onclick="goToSchoolCard('${s.id}')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer"
-      onmouseenter="this.style.background='var(--bg)'" onmouseleave="this.style.background=''">
-      <div>
-        <span style="font-weight:600">→ ${candidate.name}</span>
-        <span style="color:var(--text-tertiary);margin-left:8px;font-size:12px">${s.name}</span>
-      </div>
-      <span style="color:var(--green);font-size:11px;font-weight:600">READY TO PITCH</span>
-    </div>`;
-  }).join('') : `<div style="font-size:13px;color:var(--text-tertiary);padding:8px 0">No schools at threshold yet.</div>`;
 
   document.getElementById('ambassadors-content').innerHTML = `
     <div class="stats-bar" style="margin-bottom:24px">
-      <div class="stat-card clickable" onclick="toggleAmbStat('amb-stat-1')" style="cursor:pointer">
-        <div class="stat-label">Confirmed Ambassadors <span style="float:right;font-size:10px;color:var(--text-tertiary)" id="amb-chev-1">▼</span></div>
+      <div class="stat-card">
+        <div class="stat-label">Confirmed Ambassadors</div>
         <div class="stat-value">${PARTNER_SCHOOLS.length}</div>
         <div class="stat-sub">one per partner school</div>
-        <div id="amb-stat-1" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">${confirmedListHTML}</div>
       </div>
-      <div class="stat-card clickable" onclick="toggleAmbStat('amb-stat-2')" style="cursor:pointer">
-        <div class="stat-label">Ambassador Candidates <span style="float:right;font-size:10px;color:var(--text-tertiary)" id="amb-chev-2">▼</span></div>
+      <div class="stat-card">
+        <div class="stat-label">Ambassador Candidates</div>
         <div class="stat-value">${PROSPECTIVE_SCHOOLS.length}</div>
         <div class="stat-sub">top users at prospective schools</div>
-        <div id="amb-stat-2" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">${candidateListHTML}</div>
       </div>
-      <div class="stat-card clickable" onclick="toggleAmbStat('amb-stat-3')" style="cursor:pointer">
-        <div class="stat-label">Schools Ready to Convert <span style="float:right;font-size:10px;color:var(--text-tertiary)" id="amb-chev-3">▼</span></div>
+      <div class="stat-card">
+        <div class="stat-label">Schools Ready to Convert</div>
         <div class="stat-value" style="color:var(--green)">${readyCount}</div>
         <div class="stat-sub">≥100 active users</div>
-        <div id="amb-stat-3" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">${readyListHTML}</div>
       </div>
     </div>
-    <div class="amb-section-lbl">Confirmed Ambassadors — Partner Schools</div>
-    <div class="amb-grid">${confirmedHTML}</div>
-    <div class="amb-section-lbl">Ambassador Candidates — Prospective Schools</div>
-    <div class="amb-grid">${candidatesHTML}</div>`;
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button onclick="renderAmbassadors('all')" class="amb-filter-btn ${filter==='all'?'active':''}">All (${all.length})</button>
+      <button onclick="renderAmbassadors('ambassadors')" class="amb-filter-btn ${filter==='ambassadors'?'active':''}">Ambassadors (${ambassadors.length})</button>
+      <button onclick="renderAmbassadors('candidates')" class="amb-filter-btn ${filter==='candidates'?'active':''}">Candidates (${candidates.length})</button>
+    </div>
+    <div class="amb-list">${rowHTML || '<div style="color:var(--text-tertiary);font-size:13px;padding:16px">No results.</div>'}</div>`;
 }
 
 function toggleAmbStat(id) {
