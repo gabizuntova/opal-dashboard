@@ -1990,17 +1990,20 @@ function toggleLegend() {
 }
 
 function updateStateReach() {
-  const active = new Set([
+  const activeStates = new Set([
     ...PARTNER_SCHOOLS.map(s => s.fips),
     ...PROSPECTIVE_SCHOOLS.map(s => s.fips),
     ...ORGANIC_STATES.map(s => s.fips),
   ]).size;
+  const totalUsers = PARTNER_SCHOOLS.reduce((s,x) => s + getWeekData(x).active, 0)
+    + PROSPECTIVE_SCHOOLS.reduce((s,x) => s + getWeekData(x).active, 0)
+    + ORGANIC_STATES.reduce((s,x) => s + x.users, 0);
   const el = document.getElementById('state-reach-stat');
   const sub = document.getElementById('state-reach-sub');
-  if (el) el.textContent = `${active} / 50 states`;
+  if (el) el.textContent = `${activeStates} / 50 states`;
   if (sub) sub.textContent = 'with Opal activity';
   const titleReach = document.getElementById('map-title-reach');
-  if (titleReach) titleReach.textContent = `Active in ${active} of 50 states`;
+  if (titleReach) titleReach.textContent = `${totalUsers.toLocaleString()} active students across ${activeStates} of 50 states`;
 }
 
 // ══════════════════════════════════════════════════════════════
