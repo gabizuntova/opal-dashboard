@@ -1965,8 +1965,7 @@ function updateStateReach() {
 renderPartner();
 renderProspective();
 updateWeekUI();
-initMap();
-updateStateReach();
+requestAnimationFrame(() => { initMap(); updateStateReach(); });
 
 </script>
 </body>
