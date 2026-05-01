@@ -664,6 +664,10 @@ header {
 
 <!-- MAP VIEW -->
 <div id="view-map" class="view active">
+  <div style="padding:18px 32px 0;background:var(--surface);border-bottom:1px solid var(--border)">
+    <div style="font-size:18px;font-weight:700;letter-spacing:-0.4px;color:var(--text)">Opal Student Activity in the United States</div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;padding-bottom:14px">Click any state to explore schools and organic usage · <span id="map-title-reach" style="font-weight:500;color:var(--text)"></span></div>
+  </div>
   <div class="map-container">
     <svg id="us-map"></svg>
     <div class="map-legend">
@@ -1956,6 +1960,8 @@ function updateStateReach() {
   const sub = document.getElementById('state-reach-sub');
   if (el) el.textContent = `${active} / 50 states`;
   if (sub) sub.textContent = 'with Opal activity';
+  const titleReach = document.getElementById('map-title-reach');
+  if (titleReach) titleReach.textContent = `Active in ${active} of 50 states`;
 }
 
 // ══════════════════════════════════════════════════════════════
