@@ -606,10 +606,11 @@ header {
       <span>pal</span>
     </div>
     <div class="tabs">
+      <button class="tab-btn active" onclick="switchView('overview', this)">Overview</button>
+      <button class="tab-btn" onclick="switchView('map', this)">Map View</button>
       <button class="tab-btn" onclick="switchView('partner', this)">Partner Schools</button>
       <button class="tab-btn" onclick="switchView('prospective', this)">Prospective Schools</button>
       <button class="tab-btn" onclick="switchView('ambassadors', this)">Ambassadors</button>
-      <button class="tab-btn active" onclick="switchView('map', this)">Map View</button>
     </div>
     <div class="week-nav">
       <button class="week-nav-btn" id="btn-prev-week" onclick="prevWeek()" title="Previous week" disabled>‹</button>
@@ -618,6 +619,25 @@ header {
     </div>
   </div>
 </header>
+
+<!-- OVERVIEW -->
+<div id="view-overview" class="view active">
+  <div style="max-width:680px;margin:64px auto 0;padding:0 32px">
+    <div style="font-size:28px;font-weight:700;letter-spacing:-0.8px;margin-bottom:10px">Opal School Partnership Dashboard</div>
+    <div style="font-size:15px;color:var(--text-secondary);line-height:1.6;margin-bottom:40px">A live CRM and sales intelligence tool tracking Opal student activity across the United States — managing active school partnerships and identifying the next ones through organic student usage.</div>
+    <div class="stats-bar" id="overview-stats"></div>
+    <div style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div style="padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid var(--green)">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:8px">Customer Success</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Monitor engagement health across 7 active partner schools — tracking weekly active users, flagging at-risk accounts, and managing admin contacts.</div>
+      </div>
+      <div style="padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid #3B82F6">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:8px">Sales Pipeline</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Identify schools where students are already using Opal without admin support — and surface the student ambassadors who can lead the pitch from the inside.</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- PARTNER SCHOOLS -->
 <div id="view-partner" class="view">
@@ -663,7 +683,7 @@ header {
 </div>
 
 <!-- MAP VIEW -->
-<div id="view-map" class="view active">
+<div id="view-map" class="view">
   <div style="padding:18px 32px 0;background:var(--surface);border-bottom:1px solid var(--border)">
     <div style="font-size:18px;font-weight:700;letter-spacing:-0.4px;color:var(--text)">Opal Student Activity in the United States</div>
     <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;padding-bottom:14px">Click any state to explore schools and organic usage · <span id="map-title-reach" style="font-weight:500;color:var(--text)"></span></div>
@@ -1619,6 +1639,18 @@ function renderProspective(mode = 'urgency') {
 // VIEW SWITCHING
 // ══════════════════════════════════════════════════════════════
 
+function renderOverview() {
+  const totalPartner = PARTNER_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
+  const totalProspective = PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
+  const stateCount = new Set([...PARTNER_SCHOOLS.map(s=>s.fips),...PROSPECTIVE_SCHOOLS.map(s=>s.fips),...ORGANIC_STATES.map(s=>s.fips)]).size;
+  const ready = PROSPECTIVE_SCHOOLS.filter(s=>prospectiveStatus(getWeekData(s).active)==='ready').length;
+  document.getElementById('overview-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Partner Schools</div><div class="stat-value">${PARTNER_SCHOOLS.length}</div><div class="stat-sub">active this week</div></div>
+    <div class="stat-card"><div class="stat-label">Total Active Users</div><div class="stat-value">${(totalPartner+totalProspective).toLocaleString()}</div><div class="stat-sub">across all tracked schools</div></div>
+    <div class="stat-card"><div class="stat-label">States Active</div><div class="stat-value">${stateCount}<span style="font-size:16px;font-weight:400;color:var(--text-secondary)"> / 50</span></div><div class="stat-sub">organic + partner + pipeline</div></div>
+    <div class="stat-card"><div class="stat-label">Ready to Pitch</div><div class="stat-value" style="color:var(--green)">${ready}</div><div class="stat-sub">≥100 organic users</div></div>`;
+}
+
 function switchView(view, btn) {
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1626,6 +1658,7 @@ function switchView(view, btn) {
   btn.classList.add('active');
   if (view === 'map') { initMap(); updateStateReach(); }
   if (view === 'ambassadors') renderAmbassadors();
+  if (view === 'overview') renderOverview();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1970,8 +2003,8 @@ function updateStateReach() {
 
 renderPartner();
 renderProspective();
+renderOverview();
 updateWeekUI();
-requestAnimationFrame(() => { initMap(); updateStateReach(); });
 
 </script>
 </body>
