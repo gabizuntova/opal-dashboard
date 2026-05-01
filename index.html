@@ -955,36 +955,36 @@ const PROSPECTIVE_SCHOOLS = [
 ];
 
 const ORGANIC_STATES = [
-  {name:'Colorado',       abbr:'CO', fips:'08', users:340, prev:298, clusters:[{city:'Denver metro',users:198},{city:'Boulder',users:87},{city:'Colorado Springs',users:55}]},
-  {name:'Ohio',           abbr:'OH', fips:'39', users:210, prev:187, clusters:[{city:'Columbus',users:89},{city:'Cleveland',users:72},{city:'Cincinnati',users:49}]},
-  {name:'Idaho',          abbr:'ID', fips:'16', users:145, prev:156, clusters:[{city:'Boise',users:89},{city:'Idaho Falls',users:35},{city:"Coeur d'Alene",users:21}]},
-  {name:'Utah',           abbr:'UT', fips:'49', users:290, prev:251, clusters:[{city:'Salt Lake City',users:142},{city:'Provo',users:98},{city:'Ogden',users:50}]},
-  {name:'South Carolina', abbr:'SC', fips:'45', users:178, prev:162, clusters:[{city:'Charleston',users:73},{city:'Columbia',users:58},{city:'Greenville',users:47}]},
-  {name:'Illinois',       abbr:'IL', fips:'17', users:320, prev:289, clusters:[{city:'Chicago metro',users:198},{city:'Naperville',users:72},{city:'Evanston',users:50}]},
-  {name:'Pennsylvania',   abbr:'PA', fips:'42', users:255, prev:271, clusters:[{city:'Philadelphia',users:118},{city:'Pittsburgh',users:87},{city:'Harrisburg',users:50}]},
-  {name:'North Dakota',   abbr:'ND', fips:'38', users:87,  prev:71,  clusters:[{city:'Fargo',users:51},{city:'Bismarck',users:36}]},
-  {name:'Arkansas',       abbr:'AR', fips:'05', users:134, prev:118, clusters:[{city:'Little Rock',users:78},{city:'Fayetteville',users:56}]},
-  {name:'Georgia',        abbr:'GA', fips:'13', users:280, prev:251, clusters:[{city:'Atlanta metro',users:187},{city:'Savannah',users:54},{city:'Augusta',users:39}]},
-  {name:'North Carolina', abbr:'NC', fips:'37', users:195, prev:178, clusters:[{city:'Charlotte',users:91},{city:'Raleigh',users:67},{city:'Chapel Hill',users:37}]},
-  {name:'Arizona',        abbr:'AZ', fips:'04', users:312, prev:287, clusters:[{city:'Phoenix metro',users:198},{city:'Scottsdale',users:72},{city:'Tucson',users:42}]},
-  {name:'Nevada',         abbr:'NV', fips:'32', users:156, prev:141, clusters:[{city:'Las Vegas',users:98},{city:'Henderson',users:38},{city:'Reno',users:20}]},
-  {name:'Missouri',       abbr:'MO', fips:'29', users:223, prev:198, clusters:[{city:'St. Louis',users:112},{city:'Kansas City',users:78},{city:'Columbia',users:33}]},
-  {name:'Wisconsin',      abbr:'WI', fips:'55', users:167, prev:152, clusters:[{city:'Milwaukee',users:89},{city:'Madison',users:54},{city:'Green Bay',users:24}]},
-  {name:'Kentucky',       abbr:'KY', fips:'21', users:134, prev:119, clusters:[{city:'Louisville',users:72},{city:'Lexington',users:48},{city:'Bowling Green',users:14}]},
-  {name:'Indiana',        abbr:'IN', fips:'18', users:189, prev:172, clusters:[{city:'Indianapolis',users:103},{city:'Bloomington',users:52},{city:'Fort Wayne',users:34}]},
-  {name:'Louisiana',      abbr:'LA', fips:'22', users:108, prev:94,  clusters:[{city:'New Orleans',users:64},{city:'Baton Rouge',users:31},{city:'Shreveport',users:13}]},
-  {name:'Kansas',         abbr:'KS', fips:'20', users:124, prev:111, clusters:[{city:'Overland Park',users:67},{city:'Wichita',users:41},{city:'Lawrence',users:16}]},
-  {name:'Iowa',           abbr:'IA', fips:'19', users:98,  prev:87,  clusters:[{city:'Des Moines',users:55},{city:'Iowa City',users:30},{city:'Cedar Rapids',users:13}]},
-  {name:'Nebraska',       abbr:'NE', fips:'31', users:103, prev:91,  clusters:[{city:'Omaha',users:61},{city:'Lincoln',users:35},{city:'Bellevue',users:7}]},
-  {name:'Montana',        abbr:'MT', fips:'30', users:67,  prev:58,  clusters:[{city:'Billings',users:38},{city:'Missoula',users:29}]},
-  {name:'Wyoming',        abbr:'WY', fips:'56', users:45,  prev:38,  clusters:[{city:'Cheyenne',users:27},{city:'Casper',users:18}]},
-  {name:'Maine',          abbr:'ME', fips:'23', users:76,  prev:68,  clusters:[{city:'Portland',users:48},{city:'Bangor',users:28}]},
-  {name:'Vermont',        abbr:'VT', fips:'50', users:62,  prev:55,  clusters:[{city:'Burlington',users:39},{city:'Montpelier',users:23}]},
-  {name:'Rhode Island',   abbr:'RI', fips:'44', users:89,  prev:79,  clusters:[{city:'Providence',users:56},{city:'Newport',users:33}]},
-  {name:'Oklahoma',       abbr:'OK', fips:'40', users:143, prev:128, clusters:[{city:'Oklahoma City',users:81},{city:'Tulsa',users:44},{city:'Norman',users:18}]},
-  {name:'New Mexico',     abbr:'NM', fips:'35', users:112, prev:98,  clusters:[{city:'Albuquerque',users:67},{city:'Santa Fe',users:31},{city:'Las Cruces',users:14}]},
-  {name:'Alaska',         abbr:'AK', fips:'02', users:38,  prev:31,  clusters:[{city:'Anchorage',users:28},{city:'Fairbanks',users:10}]},
-  {name:'Hawaii',         abbr:'HI', fips:'15', users:52,  prev:44,  clusters:[{city:'Honolulu',users:38},{city:'Maui',users:14}]},
+  {name:'Colorado',       abbr:'CO', history:[245, 258, 298, 340], fips:'08', users:340, prev:298, clusters:[{city:'Denver metro',users:198},{city:'Boulder',users:87},{city:'Colorado Springs',users:55}]},
+  {name:'Ohio',           abbr:'OH', history:[178, 191, 187, 210], fips:'39', users:210, prev:187, clusters:[{city:'Columbus',users:89},{city:'Cleveland',users:72},{city:'Cincinnati',users:49}]},
+  {name:'Idaho',          abbr:'ID', history:[168, 162, 156, 145], fips:'16', users:145, prev:156, clusters:[{city:'Boise',users:89},{city:'Idaho Falls',users:35},{city:"Coeur d'Alene",users:21}]},
+  {name:'Utah',           abbr:'UT', history:[228, 245, 251, 290], fips:'49', users:290, prev:251, clusters:[{city:'Salt Lake City',users:142},{city:'Provo',users:98},{city:'Ogden',users:50}]},
+  {name:'South Carolina', abbr:'SC', history:[149, 159, 162, 178], fips:'45', users:178, prev:162, clusters:[{city:'Charleston',users:73},{city:'Columbia',users:58},{city:'Greenville',users:47}]},
+  {name:'Illinois',       abbr:'IL', history:[261, 284, 289, 320], fips:'17', users:320, prev:289, clusters:[{city:'Chicago metro',users:198},{city:'Naperville',users:72},{city:'Evanston',users:50}]},
+  {name:'Pennsylvania',   abbr:'PA', history:[285, 278, 271, 255], fips:'42', users:255, prev:271, clusters:[{city:'Philadelphia',users:118},{city:'Pittsburgh',users:87},{city:'Harrisburg',users:50}]},
+  {name:'North Dakota',   abbr:'ND', history:[52, 61, 71, 87], fips:'38', users:87,  prev:71,  clusters:[{city:'Fargo',users:51},{city:'Bismarck',users:36}]},
+  {name:'Arkansas',       abbr:'AR', history:[102, 114, 118, 134], fips:'05', users:134, prev:118, clusters:[{city:'Little Rock',users:78},{city:'Fayetteville',users:56}]},
+  {name:'Georgia',        abbr:'GA', history:[218, 239, 251, 280], fips:'13', users:280, prev:251, clusters:[{city:'Atlanta metro',users:187},{city:'Savannah',users:54},{city:'Augusta',users:39}]},
+  {name:'North Carolina', abbr:'NC', history:[158, 171, 178, 195], fips:'37', users:195, prev:178, clusters:[{city:'Charlotte',users:91},{city:'Raleigh',users:67},{city:'Chapel Hill',users:37}]},
+  {name:'Arizona',        abbr:'AZ', history:[251, 269, 287, 312], fips:'04', users:312, prev:287, clusters:[{city:'Phoenix metro',users:198},{city:'Scottsdale',users:72},{city:'Tucson',users:42}]},
+  {name:'Nevada',         abbr:'NV', history:[119, 133, 141, 156], fips:'32', users:156, prev:141, clusters:[{city:'Las Vegas',users:98},{city:'Henderson',users:38},{city:'Reno',users:20}]},
+  {name:'Missouri',       abbr:'MO', history:[178, 192, 198, 223], fips:'29', users:223, prev:198, clusters:[{city:'St. Louis',users:112},{city:'Kansas City',users:78},{city:'Columbia',users:33}]},
+  {name:'Wisconsin',      abbr:'WI', history:[138, 149, 152, 167], fips:'55', users:167, prev:152, clusters:[{city:'Milwaukee',users:89},{city:'Madison',users:54},{city:'Green Bay',users:24}]},
+  {name:'Kentucky',       abbr:'KY', history:[108, 121, 119, 134], fips:'21', users:134, prev:119, clusters:[{city:'Louisville',users:72},{city:'Lexington',users:48},{city:'Bowling Green',users:14}]},
+  {name:'Indiana',        abbr:'IN', history:[152, 168, 172, 189], fips:'18', users:189, prev:172, clusters:[{city:'Indianapolis',users:103},{city:'Bloomington',users:52},{city:'Fort Wayne',users:34}]},
+  {name:'Louisiana',      abbr:'LA', history:[79, 91, 94, 108], fips:'22', users:108, prev:94,  clusters:[{city:'New Orleans',users:64},{city:'Baton Rouge',users:31},{city:'Shreveport',users:13}]},
+  {name:'Kansas',         abbr:'KS', history:[98, 108, 111, 124], fips:'20', users:124, prev:111, clusters:[{city:'Overland Park',users:67},{city:'Wichita',users:41},{city:'Lawrence',users:16}]},
+  {name:'Iowa',           abbr:'IA', history:[81, 88, 87, 98], fips:'19', users:98,  prev:87,  clusters:[{city:'Des Moines',users:55},{city:'Iowa City',users:30},{city:'Cedar Rapids',users:13}]},
+  {name:'Nebraska',       abbr:'NE', history:[82, 89, 91, 103], fips:'31', users:103, prev:91,  clusters:[{city:'Omaha',users:61},{city:'Lincoln',users:35},{city:'Bellevue',users:7}]},
+  {name:'Montana',        abbr:'MT', history:[48, 53, 58, 67], fips:'30', users:67,  prev:58,  clusters:[{city:'Billings',users:38},{city:'Missoula',users:29}]},
+  {name:'Wyoming',        abbr:'WY', history:[28, 33, 38, 45], fips:'56', users:45,  prev:38,  clusters:[{city:'Cheyenne',users:27},{city:'Casper',users:18}]},
+  {name:'Maine',          abbr:'ME', history:[59, 65, 68, 76], fips:'23', users:76,  prev:68,  clusters:[{city:'Portland',users:48},{city:'Bangor',users:28}]},
+  {name:'Vermont',        abbr:'VT', history:[44, 51, 55, 62], fips:'50', users:62,  prev:55,  clusters:[{city:'Burlington',users:39},{city:'Montpelier',users:23}]},
+  {name:'Rhode Island',   abbr:'RI', history:[68, 74, 79, 89], fips:'44', users:89,  prev:79,  clusters:[{city:'Providence',users:56},{city:'Newport',users:33}]},
+  {name:'Oklahoma',       abbr:'OK', history:[112, 121, 128, 143], fips:'40', users:143, prev:128, clusters:[{city:'Oklahoma City',users:81},{city:'Tulsa',users:44},{city:'Norman',users:18}]},
+  {name:'New Mexico',     abbr:'NM', history:[81, 92, 98, 112], fips:'35', users:112, prev:98,  clusters:[{city:'Albuquerque',users:67},{city:'Santa Fe',users:31},{city:'Las Cruces',users:14}]},
+  {name:'Alaska',         abbr:'AK', history:[22, 27, 31, 38], fips:'02', users:38,  prev:31,  clusters:[{city:'Anchorage',users:28},{city:'Fairbanks',users:10}]},
+  {name:'Hawaii',         abbr:'HI', history:[39, 44, 44, 52], fips:'15', users:52,  prev:44,  clusters:[{city:'Honolulu',users:38},{city:'Maui',users:14}]},
 ];
 
 const FIPS_NAMES = {
@@ -1016,13 +1016,13 @@ const WEEKS = [
 let selectedWeek = 3;
 
 function getOrganicWeekTotal() {
-  return ORGANIC_STATES.reduce((sum, s) => {
-    const trend = s.users - (s.prev ?? s.users);
-    if (selectedWeek === 3) return sum + s.users;
-    if (selectedWeek === 2) return sum + (s.prev ?? s.users);
-    if (selectedWeek === 1) return sum + Math.max(0, (s.prev ?? s.users) - trend);
-    return sum + Math.max(0, (s.prev ?? s.users) - trend * 2);
-  }, 0);
+  return ORGANIC_STATES.reduce((sum, s) => sum + (s.history ? s.history[selectedWeek] : s.users), 0);
+}
+function getOrganicWeekValue(s) {
+  return s.history ? s.history[selectedWeek] : s.users;
+}
+function getOrganicPrevValue(s) {
+  return (s.history && selectedWeek > 0) ? s.history[selectedWeek - 1] : (s.prev ?? null);
 }
 
 function getWeekData(school) {
@@ -1930,16 +1930,8 @@ function buildPanel(fips) {
   if (partners.length)  html += `<div><div class="panel-section-title">Partner Schools</div>${partners.map(s=>panelSchoolHTML(s,'partner')).join('')}</div>`;
   if (prospects.length) html += `<div><div class="panel-section-title">Prospective Schools</div>${prospects.map(s=>panelSchoolHTML(s,'prospective')).join('')}</div>`;
   if (organic) {
-    const trend = organic.users - (organic.prev ?? organic.users);
-    const weekUsers = selectedWeek === 3 ? organic.users
-      : selectedWeek === 2 ? (organic.prev ?? organic.users)
-      : selectedWeek === 1 ? Math.max(0, (organic.prev ?? organic.users) - trend)
-      : Math.max(0, (organic.prev ?? organic.users) - trend * 2);
-    const prevUsers = selectedWeek > 0
-      ? (selectedWeek === 3 ? (organic.prev ?? organic.users)
-        : selectedWeek === 2 ? Math.max(0, (organic.prev ?? organic.users) - trend)
-        : Math.max(0, (organic.prev ?? organic.users) - trend * 2))
-      : null;
+    const weekUsers = getOrganicWeekValue(organic);
+    const prevUsers = getOrganicPrevValue(organic);
     const up = prevUsers === null ? true : weekUsers >= prevUsers;
     const diff = prevUsers === null ? 0 : Math.abs(weekUsers - prevUsers);
     const clusterScale = organic.users > 0 ? weekUsers / organic.users : 1;
