@@ -1852,13 +1852,17 @@ function renderAmbassadors() {
     </div>`;
   }).join('');
 
-  const readyListHTML = readySchools.map(s => {
-    const {active} = getWeekData(s);
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
-      <span style="font-weight:500">${s.name}</span>
-      <span style="color:var(--green);font-weight:600">${active} users</span>
+  const readyListHTML = readySchools.length ? readySchools.map(s => {
+    const candidate = s.users[0];
+    return `<div onclick="goToView('prospective')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer"
+      onmouseenter="this.style.background='var(--bg)'" onmouseleave="this.style.background=''">
+      <div>
+        <span style="font-weight:600">→ ${candidate.name}</span>
+        <span style="color:var(--text-tertiary);margin-left:8px;font-size:12px">${s.name}</span>
+      </div>
+      <span style="color:var(--green);font-size:11px;font-weight:600">READY TO PITCH</span>
     </div>`;
-  }).join('');
+  }).join('') : `<div style="font-size:13px;color:var(--text-tertiary);padding:8px 0">No schools at threshold yet.</div>`;
 
   document.getElementById('ambassadors-content').innerHTML = `
     <div class="stats-bar" style="margin-bottom:24px">
