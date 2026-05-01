@@ -606,10 +606,10 @@ header {
       <span>pal</span>
     </div>
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchView('partner', this)">Partner Schools</button>
+      <button class="tab-btn" onclick="switchView('partner', this)">Partner Schools</button>
       <button class="tab-btn" onclick="switchView('prospective', this)">Prospective Schools</button>
       <button class="tab-btn" onclick="switchView('ambassadors', this)">Ambassadors</button>
-      <button class="tab-btn" onclick="switchView('map', this)">Map View</button>
+      <button class="tab-btn active" onclick="switchView('map', this)">Map View</button>
     </div>
     <div class="week-nav">
       <button class="week-nav-btn" id="btn-prev-week" onclick="prevWeek()" title="Previous week" disabled>‹</button>
@@ -620,7 +620,7 @@ header {
 </header>
 
 <!-- PARTNER SCHOOLS -->
-<div id="view-partner" class="view active">
+<div id="view-partner" class="view">
   <div id="alert-strip"></div>
   <div class="stats-bar" id="partner-stats"></div>
   <div class="controls">
@@ -663,7 +663,7 @@ header {
 </div>
 
 <!-- MAP VIEW -->
-<div id="view-map" class="view">
+<div id="view-map" class="view active">
   <div class="map-container">
     <svg id="us-map"></svg>
     <div class="map-legend">
@@ -1071,6 +1071,23 @@ function getNotes(school) {
 // NEXT ACTION
 // ══════════════════════════════════════════════════════════════
 
+const SPARKLINE_COLORS = { healthy:'#16A34A', moderate:'#F59E0B', 'at-risk':'#DC2626', ready:'#16A34A', close:'#F59E0B', 'not-ready':'#3B82F6' };
+
+function sparklineHTML(history, status) {
+  if (!history || history.length < 2) return '';
+  const W = 64, H = 28;
+  const min = Math.min(...history), max = Math.max(...history);
+  const range = max - min || 1;
+  const pts = history.map((v, i) => {
+    const x = ((i / (history.length - 1)) * W).toFixed(1);
+    const y = (H - ((v - min) / range) * (H - 6) - 3).toFixed(1);
+    return `${x},${y}`;
+  }).join(' ');
+  const c = SPARKLINE_COLORS[status] || '#6B6B67';
+  const lastY = (H - ((history[history.length-1] - min) / range) * (H - 6) - 3).toFixed(1);
+  return `<svg width="${W}" height="${H}" style="display:block;margin-top:6px;overflow:visible"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/><circle cx="${W}" cy="${lastY}" r="2.5" fill="${c}"/></svg>`;
+}
+
 const GRADE_LABELS = { 9:'Freshman', 10:'Sophomore', 11:'Junior', 12:'Senior' };
 function gradeStr(g) { return g ? `${GRADE_LABELS[g]} · ${g}th` : ''; }
 
@@ -1134,7 +1151,9 @@ function trendHTML(active, prev) {
 
 function contactsHTML(school) {
   const contacts = getContacts(school);
-  const items = contacts.map((c, i) => `
+  const items = contacts.map((c, i) => {
+    const lc = c.lastContact ? new Date(c.lastContact).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : null;
+    return `
     <div class="contact-item" id="contact-item-${school.id}-${i}">
       <div class="contact-avatar">${c.name[0]}</div>
       <div class="contact-info">
@@ -1142,12 +1161,19 @@ function contactsHTML(school) {
         <div class="contact-title">${c.title || ''}</div>
         <div class="contact-detail">${c.email}</div>
         <div class="contact-detail">${c.phone}</div>
+        <div style="margin-top:5px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:${lc ? 'var(--text-tertiary)' : 'var(--red)'}">
+            ${lc ? '📅 Last contacted: ' + lc : '⚠ Never contacted'}
+          </span>
+          <button class="contact-action-btn" style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px" onclick="event.stopPropagation(); markContacted('${school.id}',${i})" title="Mark as contacted today">Mark today</button>
+        </div>
       </div>
       <div class="contact-actions">
         <button class="contact-action-btn" onclick="event.stopPropagation(); editContact('${school.id}',${i})" title="Edit">✏</button>
         <button class="contact-action-btn" onclick="event.stopPropagation(); deleteContact('${school.id}',${i})" title="Delete">🗑</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   return `
     <div class="contacts-list" id="contacts-list-${school.id}">${items}</div>
@@ -1237,6 +1263,7 @@ function renderCard(school, type) {
           <div class="card-user-count">${active}</div>
           ${trendStr}
           <div class="card-meta">this week</div>
+          ${sparklineHTML(school.history, status)}
         </div>
         <div class="card-chevron">▼</div>
       </div>
@@ -1329,6 +1356,18 @@ function editContact(id, idx) {
   document.getElementById('cf-phone-'+id).value = c.phone;
   // delete old then save new on submit
   deleteContact(id, idx);
+}
+
+function markContacted(id, idx) {
+  const school = [...PARTNER_SCHOOLS, ...PROSPECTIVE_SCHOOLS].find(s => s.id === id);
+  const contacts = getContacts(school);
+  contacts[idx].lastContact = new Date().toISOString();
+  const saved = lsLoad(id) || {};
+  saved.contacts = contacts;
+  lsSave(id, saved);
+  const type = PARTNER_SCHOOLS.find(s=>s.id===id) ? 'partner' : 'prospective';
+  const card = document.getElementById('card-'+id);
+  if (card) { card.outerHTML = renderCard(school, type); document.getElementById('card-'+id).classList.add('expanded'); }
 }
 
 function saveNotes(id) {
@@ -1518,7 +1557,9 @@ function renderPartner(mode = 'urgency') {
     label.textContent = `${schools.length} of ${PARTNER_SCHOOLS.length} schools`;
   } else { pill.style.display = 'none'; label.textContent = `${PARTNER_SCHOOLS.length} partner schools`; }
 
-  document.getElementById('partner-cards').innerHTML = schools.map(s=>renderCard(s,'partner')).join('');
+  document.getElementById('partner-cards').innerHTML = schools.length
+    ? schools.map(s=>renderCard(s,'partner')).join('')
+    : `<div style="text-align:center;padding:48px 24px;color:var(--text-tertiary);font-size:14px">All partner schools are healthy this week ✓</div>`;
 }
 
 function renderProspective(mode = 'urgency') {
@@ -1565,7 +1606,9 @@ function renderProspective(mode = 'urgency') {
     label.textContent = `${schools.length} of ${PROSPECTIVE_SCHOOLS.length} schools`;
   } else { pill.style.display = 'none'; label.textContent = `${PROSPECTIVE_SCHOOLS.length} prospective schools`; }
 
-  document.getElementById('prospective-cards').innerHTML = schools.map(s=>renderCard(s,'prospective')).join('');
+  document.getElementById('prospective-cards').innerHTML = schools.length
+    ? schools.map(s=>renderCard(s,'prospective')).join('')
+    : `<div style="text-align:center;padding:48px 24px;color:var(--text-tertiary);font-size:14px">No schools match this filter.</div>`;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1922,6 +1965,8 @@ function updateStateReach() {
 renderPartner();
 renderProspective();
 updateWeekUI();
+initMap();
+updateStateReach();
 
 </script>
 </body>
