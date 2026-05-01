@@ -651,6 +651,7 @@ header {
 
 <!-- PROSPECTIVE SCHOOLS -->
 <div id="view-prospective" class="view">
+  <div id="prospective-alert-strip"></div>
   <div class="stats-bar" id="prospective-stats"></div>
   <p class="view-subtitle">These students are already using Opal — without admin support. 100 active users is enough proof to start the conversation.</p>
   <div class="controls">
@@ -1168,6 +1169,33 @@ function renderAlerts() {
   </div>`;
 }
 
+function renderProspectiveAlerts() {
+  const el = document.getElementById('prospective-alert-strip');
+  if (!el) return;
+  const alerts = [];
+  PROSPECTIVE_SCHOOLS.forEach(s => {
+    const {active, prev} = getWeekData(s);
+    const status = prospectiveStatus(active);
+    const candidate = s.users[0];
+    const declining = prev !== null && active < prev;
+    const gap = 100 - active;
+    if (status === 'ready') {
+      alerts.push({ dot: 'green', msg: `<strong>${s.name}</strong> just crossed 100 users — start the conversation this week. Ambassador candidate: ${candidate.name} (${candidate.handle})` });
+    } else if (status === 'close' && declining) {
+      alerts.push({ dot: 'red', msg: `Momentum slipping at <strong>${s.name}</strong> — down ${prev - active} this week. Reach out to ${candidate.name} before you lose the window.` });
+    } else if (status === 'close' && !declining) {
+      alerts.push({ dot: 'amber', msg: `<strong>${s.name}</strong> is ${gap} users away from the threshold. Consider engaging ${candidate.name} to help drive adoption.` });
+    } else if (status === 'not-ready' && prev !== null && (active - prev) >= 8) {
+      alerts.push({ dot: 'amber', msg: `<strong>${s.name}</strong> is picking up fast (+${active - prev} this week) — worth watching.` });
+    }
+  });
+  if (alerts.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="alert-strip" style="background:#F0FDF4;border-color:#BBF7D0">
+    <div class="alert-strip-title" style="color:#14532D">Pipeline activity</div>
+    ${alerts.map(a => `<div class="alert-row"><div class="alert-dot alert-dot-${a.dot}"></div><span>${a.msg}</span></div>`).join('')}
+  </div>`;
+}
+
 // ══════════════════════════════════════════════════════════════
 // CARD RENDERING
 // ══════════════════════════════════════════════════════════════
@@ -1598,6 +1626,7 @@ function renderPartner(mode = 'urgency') {
 }
 
 function renderProspective(mode = 'urgency') {
+  renderProspectiveAlerts();
   prospectiveSort = mode;
   const total = PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
   const ready = PROSPECTIVE_SCHOOLS.filter(s=>prospectiveStatus(getWeekData(s).active)==='ready').length;
