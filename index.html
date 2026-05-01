@@ -1929,17 +1929,29 @@ function buildPanel(fips) {
   if (partners.length)  html += `<div><div class="panel-section-title">Partner Schools</div>${partners.map(s=>panelSchoolHTML(s,'partner')).join('')}</div>`;
   if (prospects.length) html += `<div><div class="panel-section-title">Prospective Schools</div>${prospects.map(s=>panelSchoolHTML(s,'prospective')).join('')}</div>`;
   if (organic) {
-    const up = organic.users > organic.prev, diff = Math.abs(organic.users-organic.prev);
+    const trend = organic.users - (organic.prev ?? organic.users);
+    const weekUsers = selectedWeek === 3 ? organic.users
+      : selectedWeek === 2 ? (organic.prev ?? organic.users)
+      : selectedWeek === 1 ? Math.max(0, (organic.prev ?? organic.users) - trend)
+      : Math.max(0, (organic.prev ?? organic.users) - trend * 2);
+    const prevUsers = selectedWeek > 0
+      ? (selectedWeek === 3 ? (organic.prev ?? organic.users)
+        : selectedWeek === 2 ? Math.max(0, (organic.prev ?? organic.users) - trend)
+        : Math.max(0, (organic.prev ?? organic.users) - trend * 2))
+      : null;
+    const up = prevUsers === null ? true : weekUsers >= prevUsers;
+    const diff = prevUsers === null ? 0 : Math.abs(weekUsers - prevUsers);
+    const clusterScale = organic.users > 0 ? weekUsers / organic.users : 1;
     const clustersHTML = organic.clusters ? organic.clusters.map(c =>
       `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">
         <span style="color:var(--text-secondary)">${c.city}</span>
-        <span style="font-weight:600">${c.users.toLocaleString()}</span>
+        <span style="font-weight:600">${Math.round(c.users * clusterScale).toLocaleString()}</span>
       </div>`).join('') : '';
     html += `<div><div class="panel-section-title">Organic Activity</div>
       <div class="panel-organic-box">
-        <div class="panel-organic-count">${organic.users.toLocaleString()}</div>
+        <div class="panel-organic-count">${weekUsers.toLocaleString()}</div>
         <div class="panel-organic-label">high school aged users this week</div>
-        <div style="margin-top:6px;font-size:12px;font-weight:500" class="${up?'trend-up':'trend-down'}">${up?'↑':'↓'} ${diff} vs last week</div>
+        <div style="margin-top:6px;font-size:12px;font-weight:500" class="${up?'trend-up':'trend-down'}">${prevUsers !== null ? (up?'↑':'↓')+' '+diff+' vs last week' : ''}</div>
       </div>
       ${clustersHTML ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-tertiary);margin-bottom:6px">By city</div>${clustersHTML}</div>` : ''}
       </div>`;
