@@ -1015,6 +1015,16 @@ const WEEKS = [
 ];
 let selectedWeek = 3;
 
+function getOrganicWeekTotal() {
+  return ORGANIC_STATES.reduce((sum, s) => {
+    const trend = s.users - (s.prev ?? s.users);
+    if (selectedWeek === 3) return sum + s.users;
+    if (selectedWeek === 2) return sum + (s.prev ?? s.users);
+    if (selectedWeek === 1) return sum + Math.max(0, (s.prev ?? s.users) - trend);
+    return sum + Math.max(0, (s.prev ?? s.users) - trend * 2);
+  }, 0);
+}
+
 function getWeekData(school) {
   const active = school.history ? school.history[selectedWeek] : school.active;
   const prev   = (school.history && selectedWeek > 0) ? school.history[selectedWeek - 1] : null;
@@ -1027,6 +1037,8 @@ function prevWeek() {
   updateWeekUI();
   renderPartner(partnerSort);
   renderProspective(prospectiveSort);
+  if (document.getElementById('view-map').classList.contains('active')) updateStateReach();
+  if (document.getElementById('view-overview').classList.contains('active')) renderOverview();
 }
 function nextWeek() {
   if (selectedWeek >= 3) return;
@@ -1034,6 +1046,8 @@ function nextWeek() {
   updateWeekUI();
   renderPartner(partnerSort);
   renderProspective(prospectiveSort);
+  if (document.getElementById('view-map').classList.contains('active')) updateStateReach();
+  if (document.getElementById('view-overview').classList.contains('active')) renderOverview();
 }
 function updateWeekUI() {
   document.getElementById('week-label').textContent = 'Week of ' + WEEKS[selectedWeek];
@@ -1643,12 +1657,12 @@ function goToView(view) {
 function renderOverview() {
   const totalPartner = PARTNER_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
   const totalProspective = PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
-  const totalOrganic = ORGANIC_STATES.reduce((s,x)=>s+x.users,0);
+  const totalOrganic = getOrganicWeekTotal();
   const total = totalPartner+totalProspective+totalOrganic;
   const stateCount = new Set([...PARTNER_SCHOOLS.map(s=>s.fips),...PROSPECTIVE_SCHOOLS.map(s=>s.fips),...ORGANIC_STATES.map(s=>s.fips)]).size;
   const ready = PROSPECTIVE_SCHOOLS.filter(s=>prospectiveStatus(getWeekData(s).active)==='ready').length;
   const weekEl = document.getElementById('overview-week-label');
-  if (weekEl) weekEl.textContent = `Here is what our customer success + sales pipeline looks like this week (${WEEKS[selectedWeek]}):`;
+  if (weekEl) weekEl.textContent = `Here is what our customer success + sales pipeline looks like this week:`;
   const card = (view, num, label, sub, color='') => `
     <div onclick="goToView('${view}')" style="cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;text-align:center;transition:box-shadow 0.15s,transform 0.15s;flex:1;min-width:140px"
       onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)';this.style.transform='translateY(-2px)'"
@@ -1662,8 +1676,8 @@ function renderOverview() {
     <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%">
       ${card('partner', PARTNER_SCHOOLS.length, 'Partner Schools', 'active this week')}
       ${card('map', total.toLocaleString(), 'Active Students', 'across all tracked states')}
-      ${card('map', stateCount+' / 50', 'States Active', 'organic + partner + pipeline')}
       ${card('prospective', ready, 'Ready to Pitch', '≥100 organic users', 'var(--green)')}
+      ${card('ambassadors', PARTNER_SCHOOLS.length, 'Ambassadors', PROSPECTIVE_SCHOOLS.length+' candidates in pipeline')}
     </div>`;
 }
 
@@ -2007,7 +2021,7 @@ function updateStateReach() {
   ]).size;
   const totalUsers = PARTNER_SCHOOLS.reduce((s,x) => s + getWeekData(x).active, 0)
     + PROSPECTIVE_SCHOOLS.reduce((s,x) => s + getWeekData(x).active, 0)
-    + ORGANIC_STATES.reduce((s,x) => s + x.users, 0);
+    + getOrganicWeekTotal();
   const el = document.getElementById('state-reach-stat');
   const sub = document.getElementById('state-reach-sub');
   if (el) el.textContent = `${activeStates} / 50 states`;
