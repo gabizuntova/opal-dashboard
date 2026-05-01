@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opal School Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F7F7F5;
+  --surface: #FFFFFF;
+  --border: #E8E8E4;
+  --text: #1A1A18;
+  --text-secondary: #6B6B67;
+  --text-tertiary: #A3A39F;
+  --green: #16A34A;
+  --green-bg: #DCFCE7;
+  --amber: #B45309;
+  --amber-bg: #FEF3C7;
+  --red: #DC2626;
+  --red-bg: #FEE2E2;
+  --blue: #1D4ED8;
+  --blue-bg: #DBEAFE;
+  --map-partner: #BAED91;
+  --map-prospective: #9DCAEB;
+  --map-organic: #C9A0DC;
+  --map-none: #E5E7EB;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  text-decoration: none;
+}
+.logo-ring {
+  width: 17px;
+  height: 20px;
+  border: 2.5px solid var(--text);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tabs { display: flex; gap: 4px; flex: 1; }
+.tab-btn {
+  padding: 6px 16px; border: none; background: none;
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  color: var(--text-secondary); cursor: pointer; border-radius: 8px; transition: all 0.15s;
+}
+.tab-btn:hover { background: var(--bg); color: var(--text); }
+.tab-btn.active { background: var(--text); color: white; }
+.week-label { font-size: 12px; color: var(--text-tertiary); white-space: nowrap; }
+
+/* ── VIEWS ── */
+.view { display: none; max-width: 1200px; margin: 0 auto; padding: 32px; }
+.view.active { display: block; }
+#view-map { max-width: 100%; padding: 0; height: calc(100vh - 64px); position: relative; }
+#view-map.active { display: flex; flex-direction: column; }
+
+/* ── VIEW SUBTITLE ── */
+.view-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  margin-top: -8px;
+  font-style: italic;
+}
+
+/* ── STATS BAR ── */
+.stats-bar { display: flex; gap: 16px; margin-bottom: 16px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px; flex: 1;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.stat-card.clickable { cursor: pointer; }
+.stat-card.clickable:hover { border-color: #C8C8C4; box-shadow: var(--shadow); }
+.stat-card.filter-active { border-color: var(--text); background: #F0F0EE; }
+.stat-label {
+  font-size: 11px; font-weight: 500; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+}
+.stat-value { font-size: 28px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
+.stat-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+.stat-hint { font-size: 10px; color: var(--text-tertiary); margin-top: 6px; font-style: italic; }
+.target-bar-wrap { margin-top: 10px; }
+.target-track { width: 100%; height: 5px; background: #EAEAEA; border-radius: 3px; overflow: hidden; }
+.target-fill { height: 100%; border-radius: 3px; background: var(--green); transition: width 0.4s; }
+
+/* ── CONTROLS ── */
+.controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.controls-left { display: flex; align-items: center; gap: 12px; }
+.controls-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.filter-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; background: var(--text); color: white;
+  border-radius: 20px; font-size: 11px; font-weight: 500;
+}
+.filter-pill button { background: none; border: none; color: white; cursor: pointer; font-size: 12px; padding: 0; line-height: 1; opacity: 0.7; }
+.filter-pill button:hover { opacity: 1; }
+.sort-controls { display: flex; align-items: center; gap: 8px; }
+.sort-label { font-size: 12px; color: var(--text-secondary); }
+.sort-btn {
+  padding: 5px 12px; border: 1px solid var(--border); background: var(--surface);
+  border-radius: 6px; font-family: inherit; font-size: 12px; font-weight: 500;
+  color: var(--text); cursor: pointer; transition: all 0.15s;
+}
+.sort-btn:hover, .sort-btn.active { border-color: var(--text); background: var(--text); color: white; }
+
+/* ── CARDS ── */
+.cards-grid { display: flex; flex-direction: column; gap: 12px; }
+.school-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  box-shadow: var(--shadow); transition: border-color 0.15s;
+  border-left-width: 3px;
+}
+.school-card:hover { border-color: #C8C8C4; }
+.school-card.healthy  { border-left-color: var(--green); }
+.school-card.moderate { border-left-color: #F59E0B; }
+.school-card.at-risk  { border-left-color: var(--red); }
+.school-card.ready    { border-left-color: var(--green); }
+.school-card.close    { border-left-color: #F59E0B; }
+.school-card.not-ready{ border-left-color: #3B82F6; }
+
+.card-header { padding: 20px 24px; display: flex; align-items: center; gap: 20px; cursor: pointer; user-select: none; }
+.card-main { flex: 1; min-width: 0; }
+.card-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 3px; flex-wrap: wrap; }
+.card-name { font-size: 15px; font-weight: 600; }
+.card-website {
+  font-size: 11px; color: var(--text-tertiary); text-decoration: none;
+  padding: 2px 7px; border: 1px solid var(--border); border-radius: 4px; transition: all 0.15s; white-space: nowrap;
+}
+.card-website:hover { color: var(--text); border-color: var(--text); }
+.card-location { font-size: 12px; color: var(--text-tertiary); margin-bottom: 6px; }
+.card-ambassador-row {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+  font-size: 12px; color: var(--text-secondary);
+}
+.ambassador-star { color: #CA8A04; font-size: 13px; }
+.ambassador-name { font-weight: 500; }
+.ambassador-handle { color: var(--text-tertiary); }
+.no-ambassador { font-size: 11px; color: var(--text-tertiary); font-style: italic; margin-bottom: 10px; }
+
+/* badges */
+.badge {
+  padding: 2px 8px; border-radius: 20px; font-size: 10px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; flex-shrink: 0;
+}
+.badge-healthy  { background: var(--green-bg); color: var(--green); }
+.badge-moderate { background: var(--amber-bg); color: var(--amber); }
+.badge-at-risk  { background: var(--red-bg); color: var(--red); }
+.badge-ready    { background: var(--green-bg); color: var(--green); }
+.badge-close    { background: var(--amber-bg); color: var(--amber); }
+.badge-not-ready{ background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+.badge-ambassador { background: #FEF9C3; color: #854D0E; font-size: 9px; }
+
+/* progress */
+.progress-track { width: 100%; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+.progress-fill  { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.progress-fill-healthy  { background: var(--green); }
+.progress-fill-moderate { background: #F59E0B; }
+.progress-fill-at-risk  { background: var(--red); }
+.progress-fill-ready    { background: var(--green); }
+.progress-fill-close    { background: #F59E0B; }
+.progress-fill-not-ready{ background: #3B82F6; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-tertiary); }
+
+.card-stats { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; min-width: 110px; }
+.card-user-count { font-size: 32px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
+.card-trend { font-size: 12px; font-weight: 500; margin-top: 3px; }
+.trend-up   { color: var(--green); }
+.trend-down { color: var(--red); }
+.trend-neutral { color: var(--text-tertiary); }
+.card-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+.card-chevron { color: var(--text-tertiary); flex-shrink: 0; transition: transform 0.2s; font-size: 11px; }
+.school-card.expanded .card-chevron { transform: rotate(180deg); }
+
+/* accordion */
+.card-detail { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+.school-card.expanded .card-detail { max-height: 900px; }
+.card-detail-inner { border-top: 1px solid var(--border); padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.detail-section-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 12px;
+}
+
+/* user list */
+.user-list { display: flex; flex-direction: column; gap: 10px; }
+.user-row { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 4px; border-radius: 6px; transition: background 0.1s; }
+.user-row:hover { background: var(--bg); }
+.user-rank { font-size: 11px; font-weight: 600; color: var(--text-tertiary); width: 16px; text-align: center; flex-shrink: 0; }
+.user-rank-1 { color: #CA8A04; }
+.user-avatar {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--bg);
+  border: 1px solid var(--border); display: flex; align-items: center;
+  justify-content: center; font-size: 11px; font-weight: 600;
+  color: var(--text-secondary); flex-shrink: 0;
+}
+.user-avatar-ambassador { border-color: #CA8A04; background: #FFFBEB; color: #92400E; }
+.user-name { font-size: 13px; font-weight: 500; }
+.user-handle { font-size: 12px; color: var(--text-tertiary); }
+.user-star { margin-left: 4px; font-size: 11px; }
+
+/* contacts */
+.contacts-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.contact-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border);
+}
+.contact-avatar {
+  width: 28px; height: 28px; border-radius: 50%; background: #E8E8E4;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0;
+}
+.contact-info { flex: 1; min-width: 0; }
+.contact-name { font-size: 13px; font-weight: 600; }
+.contact-title { font-size: 11px; color: var(--text-secondary); margin-bottom: 2px; }
+.contact-detail { font-size: 11px; color: var(--text-tertiary); }
+.contact-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.contact-action-btn {
+  background: none; border: none; cursor: pointer; color: var(--text-tertiary);
+  font-size: 12px; padding: 3px; border-radius: 4px; transition: all 0.1s;
+}
+.contact-action-btn:hover { background: var(--border); color: var(--text); }
+
+/* add contact form */
+.add-contact-form {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; display: none; flex-direction: column; gap: 8px; margin-bottom: 10px;
+}
+.add-contact-form.open { display: flex; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.field-input {
+  width: 100%; padding: 7px 10px; border: 1px solid var(--border);
+  border-radius: 6px; font-family: inherit; font-size: 13px; color: var(--text);
+  background: var(--surface); transition: border-color 0.15s;
+}
+.field-input:focus { outline: none; border-color: var(--text); }
+.field-input::placeholder { color: var(--text-tertiary); }
+.form-actions { display: flex; gap: 8px; }
+.btn-primary {
+  padding: 7px 14px; background: var(--text); color: white; border: none;
+  border-radius: 6px; font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary {
+  padding: 7px 14px; background: none; color: var(--text-secondary);
+  border: 1px solid var(--border); border-radius: 6px; font-family: inherit;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+}
+.btn-secondary:hover { border-color: var(--text); color: var(--text); }
+.add-contact-trigger {
+  display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px;
+  background: none; border: 1px dashed var(--border); border-radius: 6px;
+  font-family: inherit; font-size: 12px; color: var(--text-secondary);
+  cursor: pointer; transition: all 0.15s; width: 100%; justify-content: center;
+}
+.add-contact-trigger:hover { border-color: var(--text); color: var(--text); }
+.notes-section { margin-top: 12px; }
+.field-textarea { resize: vertical; min-height: 64px; }
+.save-confirm { font-size: 11px; color: var(--green); display: none; margin-left: 8px; }
+
+/* ── WEEK NAV ── */
+.week-nav { display: flex; align-items: center; gap: 6px; }
+.week-nav-btn {
+  background: none; border: 1px solid var(--border); border-radius: 5px;
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-secondary); font-size: 14px; transition: all 0.15s; padding: 0;
+}
+.week-nav-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
+.week-nav-btn:disabled { opacity: 0.25; cursor: default; }
+
+/* ── PITCH MODAL ── */
+.pitch-modal-box {
+  background: white; border-radius: 16px; width: 420px; max-width: 92vw;
+  max-height: 86vh; display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+}
+.pitch-header-bar {
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.pitch-school-name { font-size: 17px; font-weight: 700; letter-spacing: -0.4px; }
+.pitch-school-loc  { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.pitch-body { padding: 22px 24px; overflow-y: auto; }
+.pitch-type-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;
+}
+.pitch-type-impact { background: #DCFCE7; color: #16A34A; }
+.pitch-type-pitch  { background: #DBEAFE; color: #1D4ED8; }
+.pitch-hero-num { font-size: 52px; font-weight: 800; letter-spacing: -2.5px; line-height: 1; margin-bottom: 4px; }
+.pitch-hero-lbl { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+.pitch-trend    { font-size: 13px; font-weight: 500; margin-bottom: 18px; }
+.pitch-divider  { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.pitch-amb-row  {
+  display: flex; align-items: center; gap: 12px; padding: 12px;
+  background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; margin-bottom: 16px;
+}
+.pitch-amb-avatar {
+  width: 40px; height: 40px; border-radius: 50%; background: #FFFBEB;
+  border: 2px solid #CA8A04; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #92400E; flex-shrink: 0;
+}
+.pitch-amb-name   { font-size: 13px; font-weight: 600; }
+.pitch-amb-handle { font-size: 12px; color: var(--text-tertiary); }
+.pitch-amb-stats  { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.pitch-hook {
+  background: var(--bg); border-left: 3px solid var(--text); border-radius: 0 6px 6px 0;
+  padding: 12px 14px; font-size: 13px; font-style: italic; line-height: 1.55; margin-bottom: 20px;
+}
+.pitch-print-btn {
+  width: 100%; padding: 11px; background: var(--text); color: white; border: none;
+  border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.pitch-print-btn:hover { opacity: 0.82; }
+.pitch-card-btn {
+  font-size: 10px; padding: 2px 7px; border: 1px solid var(--border); background: none;
+  border-radius: 4px; color: var(--text-tertiary); cursor: pointer; font-family: inherit;
+  transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+}
+.pitch-card-btn:hover { border-color: var(--text); color: var(--text); }
+
+/* ── AMBASSADOR TAB ── */
+.amb-section-lbl {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-secondary); margin-bottom: 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.amb-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.amb-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+  box-shadow: var(--shadow); transition: border-color 0.15s; cursor: pointer; border-left-width: 3px;
+}
+.amb-card:hover { border-color: #C8C8C4; }
+.amb-card.confirmed { border-left-color: #CA8A04; }
+.amb-card.candidate { border-left-color: #60A5FA; }
+.amb-avatar {
+  width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 17px; font-weight: 700; flex-shrink: 0;
+}
+.amb-avatar.confirmed { background: #FFFBEB; border: 2px solid #CA8A04; color: #92400E; }
+.amb-avatar.candidate { background: #EFF6FF; border: 2px solid #60A5FA; color: #1D4ED8; }
+.amb-info { flex: 1; min-width: 0; }
+.amb-name   { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.amb-handle { font-size: 12px; color: var(--text-tertiary); }
+.amb-school { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+.amb-metrics { display: flex; gap: 20px; flex-shrink: 0; }
+.amb-metric { text-align: center; }
+.amb-metric-val { font-size: 17px; font-weight: 700; letter-spacing: -0.5px; }
+.amb-metric-lbl { font-size: 10px; color: var(--text-tertiary); }
+.amb-contact-btn {
+  padding: 6px 13px; border: 1px solid var(--border); background: none;
+  border-radius: 6px; font-family: inherit; font-size: 12px; font-weight: 500;
+  color: var(--text-secondary); cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+  align-self: center;
+}
+.amb-contact-btn:hover { border-color: var(--text); color: var(--text); background: var(--bg); }
+
+@media print {
+  body > *:not(#pitch-modal) { display: none !important; }
+  #pitch-modal { display: flex !important; position: static !important; background: none !important; }
+  #pitch-modal .pitch-modal-box { box-shadow: none !important; max-height: none !important; }
+  .pitch-print-btn, .modal-close { display: none !important; }
+}
+
+/* ── MODAL (shared) ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35); z-index: 300;
+  align-items: center; justify-content: center; backdrop-filter: blur(2px);
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: white; border-radius: 16px; width: 500px; max-width: 92vw;
+  max-height: 82vh; display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+}
+.modal-header {
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 15px; font-weight: 600; }
+.modal-close { background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 18px; line-height: 1; }
+.modal-body { padding: 20px 24px; overflow-y: auto; }
+
+/* ranking modal */
+.modal-school-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.modal-school-row:last-child { border-bottom: none; }
+.modal-rank { font-size: 13px; font-weight: 600; color: var(--text-tertiary); width: 20px; flex-shrink: 0; }
+.modal-rank-1 { color: #CA8A04; }
+.modal-school-info { flex: 1; min-width: 0; }
+.modal-school-name { font-size: 13px; font-weight: 600; }
+.modal-school-loc  { font-size: 11px; color: var(--text-tertiary); }
+.modal-bar-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; width: 140px; }
+.modal-bar-track { flex: 1; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.modal-bar-fill  { height: 100%; border-radius: 3px; }
+.modal-count { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; }
+
+/* user profile modal */
+.profile-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+}
+.profile-avatar {
+  width: 52px; height: 52px; border-radius: 50%; background: var(--bg);
+  border: 2px solid var(--border); display: flex; align-items: center;
+  justify-content: center; font-size: 20px; font-weight: 700;
+  color: var(--text-secondary); flex-shrink: 0;
+}
+.profile-avatar-ambassador { border-color: #CA8A04; background: #FFFBEB; color: #92400E; }
+.profile-name { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+.profile-handle { font-size: 13px; color: var(--text-tertiary); }
+.profile-school { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+.profile-badges { display: flex; gap: 6px; margin-top: 6px; }
+.profile-section-title {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 10px;
+}
+.profile-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.profile-metric {
+  background: var(--bg); border-radius: 8px; padding: 12px; text-align: center;
+}
+.profile-metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.profile-metric-label { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+.mini-chart { display: flex; align-items: flex-end; gap: 5px; height: 40px; }
+.mini-bar {
+  flex: 1; border-radius: 3px 3px 0 0;
+  background: linear-gradient(to top, #BAED91, #86EFAC);
+}
+.chart-labels { display: flex; justify-content: space-between; margin-top: 4px; }
+.chart-label { font-size: 9px; color: var(--text-tertiary); flex: 1; text-align: center; }
+
+/* ── MAP ── */
+.map-container { flex: 1; position: relative; overflow: hidden; background: #EEF2F7; }
+#us-map { width: 100%; height: 100%; }
+.map-legend {
+  position: absolute; bottom: 24px; left: 24px; background: white;
+  border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); z-index: 10;
+}
+.legend-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 2px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+.legend-swatch-partner     { background: var(--map-partner); border: 1px solid #8DC86A; }
+.legend-swatch-prospective { background: var(--map-prospective); border: 1px solid #6FA8CC; }
+.legend-swatch-organic     { background: var(--map-organic); border: 1px solid #A07AB8; }
+.legend-swatch-none        { background: var(--map-none); border: 1px solid #D1D5DB; }
+.legend-swatch-both {
+  background: repeating-linear-gradient(45deg, #BAED91 0px, #BAED91 4px, #9DCAEB 4px, #9DCAEB 8px);
+  border: 1px solid #aaa;
+}
+.legend-title-row { display: flex; align-items: center; justify-content: space-between; }
+.legend-toggle-btn {
+  background: none; border: none; cursor: pointer; font-size: 11px;
+  color: var(--text-tertiary); padding: 0; line-height: 1; transition: transform 0.2s;
+}
+.legend-toggle-btn.collapsed { transform: rotate(-90deg); }
+.legend-body { overflow: hidden; transition: max-height 0.25s ease, opacity 0.2s; max-height: 300px; opacity: 1; }
+.legend-body.collapsed { max-height: 0; opacity: 0; }
+.map-tooltip {
+  position: fixed; background: rgba(26,26,24,0.88); color: white;
+  padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  pointer-events: none; z-index: 200; display: none;
+}
+.map-panel {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 340px;
+  background: white; border-left: 1px solid var(--border);
+  transform: translateX(100%); transition: transform 0.25s ease;
+  overflow-y: auto; z-index: 50; box-shadow: -4px 0 16px rgba(0,0,0,0.06);
+}
+.map-panel.open { transform: translateX(0); }
+.panel-header {
+  padding: 20px 20px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between;
+  position: sticky; top: 0; background: white; z-index: 2;
+}
+.panel-state-name { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+.panel-state-type { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.panel-close { background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 16px; }
+.panel-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 20px; }
+.panel-section-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 10px; }
+.panel-school-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+.panel-school-header {
+  padding: 10px 12px; cursor: pointer; display: flex; align-items: center;
+  justify-content: space-between; user-select: none; transition: background 0.1s;
+}
+.panel-school-header:hover { background: var(--bg); }
+.panel-school-name { font-size: 13px; font-weight: 600; }
+.panel-school-sub  { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.panel-chevron { font-size: 10px; color: var(--text-tertiary); transition: transform 0.2s; }
+.panel-school-item.expanded .panel-chevron { transform: rotate(180deg); }
+.panel-school-detail { display: none; border-top: 1px solid var(--border); padding: 12px; background: var(--bg); }
+.panel-school-item.expanded .panel-school-detail { display: block; }
+.panel-user-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; border-radius: 4px; }
+.panel-user-row:hover { background: var(--border); padding-left: 4px; }
+.panel-user-rank { font-size: 10px; font-weight: 600; color: var(--text-tertiary); width: 14px; flex-shrink: 0; }
+.panel-user-rank-1 { color: #CA8A04; }
+.panel-user-name { font-size: 12px; font-weight: 500; }
+.panel-user-handle { font-size: 11px; color: var(--text-tertiary); }
+.panel-website-link { display: inline-block; margin-top: 10px; font-size: 11px; color: var(--blue); text-decoration: none; font-weight: 500; }
+.panel-website-link:hover { text-decoration: underline; }
+.panel-organic-box { padding: 14px; background: #F5F3FF; border-radius: 8px; border: 1px solid #DDD6FE; }
+.panel-organic-count { font-size: 28px; font-weight: 700; color: #7C3AED; letter-spacing: -1px; line-height: 1; }
+.panel-organic-label { font-size: 11px; color: #7C3AED; opacity: 0.8; margin-top: 2px; }
+.panel-empty { font-size: 13px; color: var(--text-tertiary); font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="map-tooltip" id="tooltip"></div>
+
+<!-- RANKING MODAL -->
+<div class="modal-overlay" id="ranking-modal" onclick="closeModal('ranking-modal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="ranking-title"></div>
+      <button class="modal-close" onclick="closeModal('ranking-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="ranking-body"></div>
+  </div>
+</div>
+
+<!-- PITCH CARD MODAL -->
+<div class="modal-overlay" id="pitch-modal" onclick="closeModal('pitch-modal')">
+  <div class="pitch-modal-box" onclick="event.stopPropagation()">
+    <div class="pitch-header-bar">
+      <div>
+        <div class="pitch-school-name" id="pitch-school-name"></div>
+        <div class="pitch-school-loc" id="pitch-school-loc"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('pitch-modal')">✕</button>
+    </div>
+    <div class="pitch-body" id="pitch-body"></div>
+  </div>
+</div>
+
+<!-- USER PROFILE MODAL -->
+<div class="modal-overlay" id="profile-modal" onclick="closeModal('profile-modal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Student Profile</div>
+      <button class="modal-close" onclick="closeModal('profile-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="profile-body"></div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-ring"></div>
+      <span>pal</span>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchView('partner', this)">Partner Schools</button>
+      <button class="tab-btn" onclick="switchView('prospective', this)">Prospective Schools</button>
+      <button class="tab-btn" onclick="switchView('ambassadors', this)">Ambassadors</button>
+      <button class="tab-btn" onclick="switchView('map', this)">Map View</button>
+    </div>
+    <div class="week-nav">
+      <button class="week-nav-btn" id="btn-prev-week" onclick="prevWeek()" title="Previous week" disabled>‹</button>
+      <div class="week-label" id="week-label">Week of May 4–10, 2026</div>
+      <button class="week-nav-btn" id="btn-next-week" onclick="nextWeek()" title="Next week" disabled>›</button>
+    </div>
+  </div>
+</header>
+
+<!-- PARTNER SCHOOLS -->
+<div id="view-partner" class="view active">
+  <div class="stats-bar" id="partner-stats"></div>
+  <div class="controls">
+    <div class="controls-left">
+      <span class="controls-title" id="partner-count-label">7 partner schools</span>
+      <div id="partner-filter-pill" style="display:none"></div>
+    </div>
+    <div class="sort-controls">
+      <span class="sort-label">Sort:</span>
+      <button class="sort-btn active" onclick="sortCards('partner','urgency',this)">Urgency</button>
+      <button class="sort-btn" onclick="sortCards('partner','desc',this)">Most Active ↓</button>
+      <button class="sort-btn" onclick="sortCards('partner','asc',this)">Least Active ↑</button>
+    </div>
+  </div>
+  <div class="cards-grid" id="partner-cards"></div>
+</div>
+
+<!-- PROSPECTIVE SCHOOLS -->
+<div id="view-prospective" class="view">
+  <div class="stats-bar" id="prospective-stats"></div>
+  <p class="view-subtitle">These students are already using Opal — without admin support. 100 active users is enough proof to start the conversation.</p>
+  <div class="controls">
+    <div class="controls-left">
+      <span class="controls-title" id="prospective-count-label">5 prospective schools</span>
+      <div id="prospective-filter-pill" style="display:none"></div>
+    </div>
+    <div class="sort-controls">
+      <span class="sort-label">Sort:</span>
+      <button class="sort-btn active" onclick="sortCards('prospective','urgency',this)">Urgency</button>
+      <button class="sort-btn" onclick="sortCards('prospective','desc',this)">Most Active ↓</button>
+      <button class="sort-btn" onclick="sortCards('prospective','asc',this)">Least Active ↑</button>
+    </div>
+  </div>
+  <div class="cards-grid" id="prospective-cards"></div>
+</div>
+
+<!-- AMBASSADORS -->
+<div id="view-ambassadors" class="view">
+  <div id="ambassadors-content"></div>
+</div>
+
+<!-- MAP VIEW -->
+<div id="view-map" class="view">
+  <div class="map-container">
+    <svg id="us-map"></svg>
+    <div class="map-legend">
+      <div class="legend-title-row">
+        <div class="legend-title">Activity</div>
+        <button class="legend-toggle-btn" id="legend-toggle" onclick="toggleLegend()" title="Collapse legend">▼</button>
+      </div>
+      <div class="legend-body" id="legend-body">
+        <div style="height:6px"></div>
+        <div class="legend-item"><div class="legend-swatch legend-swatch-partner"></div>Partner School</div>
+        <div class="legend-item"><div class="legend-swatch legend-swatch-prospective"></div>Prospective School</div>
+        <div class="legend-item"><div class="legend-swatch legend-swatch-both"></div>Partner + Prospective</div>
+        <div class="legend-item"><div class="legend-swatch legend-swatch-organic"></div>Organic Users</div>
+        <div class="legend-item"><div class="legend-swatch legend-swatch-none"></div>No Activity</div>
+        <div style="border-top:1px solid var(--border);margin:8px 0"></div>
+        <div id="state-reach-stat" style="font-size:12px;font-weight:600;color:var(--text)"></div>
+        <div id="state-reach-sub" style="font-size:10px;color:var(--text-tertiary);margin-top:1px"></div>
+      </div>
+    </div>
+    <div class="map-panel" id="map-panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-state-name" id="panel-state-name"></div>
+          <div class="panel-state-type" id="panel-state-type"></div>
+        </div>
+        <button class="panel-close" onclick="closePanel()">✕</button>
+      </div>
+      <div class="panel-body" id="panel-body"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+<script>
+
+// ══════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════
+
+const PARTNER_SCHOOLS = [
+  {
+    id:'hwk', name:'Harvard-Westlake School', city:'Los Angeles', state:'CA', fips:'06',
+    website:'https://www.hw.edu', active:187, prev:162, target:150, history:[138,149,162,187],
+    admin:[{name:'Dr. Patricia Chen', title:'Head of Student Affairs', email:'p.chen@hw.edu', phone:'(310) 555-0142'}],
+    users:[
+      {name:'Sophia Williams',  handle:'@sophwill',       sessions:14, streak:18, score:97},
+      {name:'Marcus Chen',      handle:'@mchen_opal',     sessions:11, streak:12, score:88},
+      {name:'Aiden Park',       handle:'@thunderbird2201',sessions:9,  streak:9,  score:81},
+      {name:'Isabella Torres',  handle:'@izzy_t',         sessions:8,  streak:7,  score:74},
+      {name:'Noah Kim',         handle:'@noahopalite',    sessions:6,  streak:5,  score:68},
+    ], notes:'',
+  },
+  {
+    id:'tds', name:'Trevor Day School', city:'New York', state:'NY', fips:'36',
+    website:'https://www.trevordayschool.org', active:143, prev:151, target:150, history:[164,158,151,143],
+    admin:[{name:'Ms. Rachel Goldstein', title:'Director of Technology', email:'r.goldstein@trevordayschool.org', phone:'(212) 555-0198'}],
+    users:[
+      {name:'Emma Rodriguez',   handle:'@emrod99',        sessions:12, streak:14, score:91},
+      {name:'James Liu',        handle:'@liuj_opal',      sessions:10, streak:11, score:85},
+      {name:'Chloe Martin',     handle:'@chloemar',       sessions:8,  streak:8,  score:77},
+      {name:'Tyler Brooks',     handle:'@papagoite3400',  sessions:7,  streak:6,  score:70},
+      {name:'Priya Patel',      handle:'@priyap',         sessions:5,  streak:4,  score:63},
+    ], notes:'',
+  },
+
+  {
+    id:'smk', name:"St. Mark's School of Texas", city:'Dallas', state:'TX', fips:'48',
+    website:'https://www.smtexas.org', active:112, prev:134, target:150, history:[148,143,134,112],
+    admin:[{name:'Mr. Thomas Reed', title:'Upper School Principal', email:'t.reed@smtexas.org', phone:'(214) 555-0155'}],
+    users:[
+      {name:'Jackson Miller',   handle:'@jackm',          sessions:10, streak:10, score:83},
+      {name:'Sofia Garcia',     handle:'@sofgar',         sessions:8,  streak:8,  score:76},
+      {name:'Owen Wilson',      handle:'@owilson',        sessions:7,  streak:6,  score:69},
+      {name:'Amelia Clark',     handle:'@amclark',        sessions:5,  streak:5,  score:62},
+      {name:'Henry Lee',        handle:'@hlee_opal',      sessions:4,  streak:3,  score:55},
+    ], notes:'',
+  },
+  {
+    id:'pcr', name:'Pine Crest School', city:'Fort Lauderdale', state:'FL', fips:'12',
+    website:'https://www.pinecrest.edu', active:98, prev:107, target:150, history:[121,116,107,98],
+    admin:[{name:'Mrs. Sandra Lopez', title:'Dean of Students', email:'s.lopez@pinecrest.edu', phone:'(954) 555-0133'}],
+    users:[
+      {name:'Charlotte Adams',  handle:'@charlott',       sessions:9,  streak:9,  score:80},
+      {name:'Benjamin Harris',  handle:'@benharris',      sessions:7,  streak:7,  score:73},
+      {name:'Aria Robinson',    handle:'@aria_r',         sessions:6,  streak:5,  score:66},
+      {name:'Daniel Martinez',  handle:'@dmart',          sessions:4,  streak:4,  score:58},
+      {name:'Grace Taylor',     handle:'@gtaylor',        sessions:3,  streak:2,  score:51},
+    ], notes:'',
+  },
+  {
+    id:'mlt', name:'Milton Academy', city:'Milton', state:'MA', fips:'25',
+    website:'https://www.milton.edu', active:171, prev:165, target:150, history:[153,159,165,171],
+    admin:[{name:'Dr. James Whitmore', title:'Director of Innovation', email:'j.whitmore@milton.edu', phone:'(617) 555-0144'}],
+    users:[
+      {name:'Samuel Anderson',  handle:'@samand',         sessions:13, streak:16, score:94},
+      {name:'Victoria Young',   handle:'@vicyoung',       sessions:11, streak:12, score:87},
+      {name:'Christopher Lee',  handle:'@clee99',         sessions:9,  streak:9,  score:79},
+      {name:'Hannah Wilson',    handle:'@hanwil',         sessions:7,  streak:6,  score:71},
+      {name:'Ryan Thompson',    handle:'@rthompson',      sessions:5,  streak:4,  score:64},
+    ], notes:'',
+  },
+  {
+    id:'blk', name:'Blake School', city:'Minneapolis', state:'MN', fips:'27',
+    website:'https://www.blakeschool.org', active:162, prev:149, target:150, history:[128,141,149,162],
+    admin:[{name:'Mr. Daniel Okafor', title:'Director of Learning Technology', email:'d.okafor@blakeschool.org', phone:'(612) 555-0183'}],
+    users:[
+      {name:'Elise Hanson',    handle:'@eliseh',        sessions:12, streak:14, score:90},
+      {name:'Marcus Webb',     handle:'@mwebb_opal',    sessions:10, streak:10, score:83},
+      {name:'Jade Nguyen',     handle:'@jadeng',        sessions:8,  streak:8,  score:75},
+      {name:'Ryan Sorenson',   handle:'@rsorenson',     sessions:6,  streak:5,  score:67},
+      {name:'Tess Coleman',    handle:'@tesscoleman',   sessions:4,  streak:3,  score:59},
+    ], notes:'',
+  },
+  {
+    id:'lks', name:'Lakeside School', city:'Seattle', state:'WA', fips:'53',
+    website:'https://www.lakesideschool.org', active:128, prev:119, target:150, history:[102,109,119,128],
+    admin:[{name:'Ms. Karen Foster', title:'Head of Upper School', email:'k.foster@lakesideschool.org', phone:'(206) 555-0161'}],
+    users:[
+      {name:'Nathan Park',      handle:'@natpark',        sessions:11, streak:13, score:89},
+      {name:'Zoe Mitchell',     handle:'@zoemitch',       sessions:9,  streak:10, score:82},
+      {name:'Caleb Turner',     handle:'@caleb_t',        sessions:7,  streak:7,  score:74},
+      {name:'Lily Phillips',    handle:'@lillyp',         sessions:6,  streak:5,  score:67},
+      {name:'Sebastian Evans',  handle:'@seb_opal',       sessions:4,  streak:4,  score:59},
+    ], notes:'',
+  },
+];
+
+const PROSPECTIVE_SCHOOLS = [
+  {
+    id:'png', name:'The Pingry School', city:'Short Hills', state:'NJ', fips:'34',
+    website:'https://www.pingry.org', active:78, prev:65, target:100, history:[41,52,65,78],
+    admin:[{name:'Mr. David Walsh', title:'Upper School Dean', email:'d.walsh@pingry.org', phone:'(973) 555-0117'}],
+    users:[
+      {name:'Alex Johnson',     handle:'@alexj',          sessions:12, streak:15, score:92},
+      {name:'Mia Thompson',     handle:'@mia_t',          sessions:10, streak:11, score:85},
+      {name:'Ethan Davis',      handle:'@ethandavis',     sessions:8,  streak:8,  score:77},
+      {name:'Olivia White',     handle:'@owhite22',       sessions:6,  streak:6,  score:69},
+      {name:'Lucas Brown',      handle:'@lb_opal',        sessions:4,  streak:3,  score:61},
+    ], notes:'',
+  },
+  {
+    id:'eph', name:'Episcopal High School', city:'Alexandria', state:'VA', fips:'51',
+    website:'https://www.episcopalhighschool.org', active:89, prev:71, target:100, history:[45,55,71,89],
+    admin:[{name:'Dr. Charles Morrison', title:'Head of School', email:'c.morrison@episcopalhighschool.org', phone:'(703) 555-0178'}],
+    users:[
+      {name:'Madison Scott',    handle:'@madscott',       sessions:9,  streak:10, score:82},
+      {name:'Austin Green',     handle:'@austgreen',      sessions:7,  streak:7,  score:74},
+      {name:'Bella King',       handle:'@bellak',         sessions:6,  streak:5,  score:67},
+      {name:'Jordan Baker',     handle:'@jbaker',         sessions:4,  streak:4,  score:59},
+      {name:'Landon Hall',      handle:'@lhall',          sessions:3,  streak:2,  score:52},
+    ], notes:'',
+  },
+  {
+    id:'gpr', name:'Georgetown Preparatory School', city:'North Bethesda', state:'MD', fips:'24',
+    website:'https://www.gprep.org', active:113, prev:98, target:100, history:[74,84,98,113],
+    admin:[{name:'Rev. Michael Flynn', title:'Dean of Students', email:'m.flynn@gprep.org', phone:'(301) 555-0192'}],
+    users:[
+      {name:'Claire Nelson',    handle:'@clairenels',     sessions:11, streak:13, score:90},
+      {name:'Patrick Carter',   handle:'@pcarter',        sessions:9,  streak:10, score:83},
+      {name:'Abigail Perez',    handle:'@abiperez',       sessions:7,  streak:7,  score:75},
+      {name:'Connor Mitchell',  handle:'@cmitch',         sessions:5,  streak:5,  score:67},
+      {name:'Savannah Roberts', handle:'@sav_r',          sessions:4,  streak:3,  score:59},
+    ], notes:'',
+  },
+  {
+    id:'htk', name:'The Hotchkiss School', city:'Lakeville', state:'CT', fips:'09',
+    website:'https://www.hotchkiss.org', active:67, prev:54, target:100, history:[34,43,54,67],
+    admin:[{name:'Mr. Lawrence Kim', title:'Assistant Head', email:'l.kim@hotchkiss.org', phone:'(860) 555-0103'}],
+    users:[
+      {name:'Brooke Campbell',  handle:'@brookec',        sessions:8,  streak:9,  score:80},
+      {name:'Miles Morris',     handle:'@mmorris',        sessions:6,  streak:6,  score:72},
+      {name:'Stella Rogers',    handle:'@stell_r',        sessions:5,  streak:5,  score:64},
+      {name:'Finn Reed',        handle:'@finnr',          sessions:3,  streak:3,  score:57},
+      {name:'Leah Cook',        handle:'@leahc',          sessions:2,  streak:2,  score:49},
+    ], notes:'',
+  },
+  {
+    id:'mba', name:'Montgomery Bell Academy', city:'Nashville', state:'TN', fips:'47',
+    website:'https://www.montgomerybell.org', active:104, prev:109, target:100, history:[121,116,109,104],
+    admin:[{name:'Mr. Stuart Worden', title:'Director of Student Life', email:'s.worden@montgomerybell.org', phone:'(615) 555-0127'}],
+    users:[
+      {name:'Cooper Bailey',    handle:'@coopbail',       sessions:10, streak:11, score:87},
+      {name:'Haley Rivera',     handle:'@hrivera',        sessions:8,  streak:8,  score:79},
+      {name:'Dominic Hughes',   handle:'@domhug',         sessions:6,  streak:6,  score:71},
+      {name:'Faith Price',      handle:'@faithp',         sessions:5,  streak:4,  score:63},
+      {name:'Jasper Coleman',   handle:'@jcoleman',       sessions:3,  streak:3,  score:55},
+    ], notes:'',
+  },
+  {
+    id:'brk', name:'Breck School', city:'Golden Valley', state:'MN', fips:'27',
+    website:'https://www.breckschool.org', active:84, prev:70, target:100, history:[42,55,70,84],
+    admin:[{name:'Ms. Karen Liu', title:'Upper School Principal', email:'k.liu@breckschool.org', phone:'(763) 555-0196'}],
+    users:[
+      {name:'Owen Bradley',    handle:'@owenbrad',      sessions:8,  streak:9,  score:79},
+      {name:'Zara Singh',      handle:'@zarasingh',     sessions:6,  streak:6,  score:71},
+      {name:'Max Donnelly',    handle:'@maxd_opal',     sessions:5,  streak:4,  score:63},
+      {name:'Lily Chen',       handle:'@lilyc',         sessions:3,  streak:3,  score:55},
+      {name:'Ethan Ross',      handle:'@ethanross',     sessions:2,  streak:2,  score:47},
+    ], notes:'',
+  },
+  {
+    id:'ctg', name:'Catlin Gabel School', city:'Portland', state:'OR', fips:'41',
+    website:'https://www.catlingabel.org', active:78, prev:62, target:100, history:[38,49,62,78],
+    admin:[{name:'Ms. Diane Sherwood', title:'Head of Academics', email:'d.sherwood@catlingabel.org', phone:'(503) 555-0149'}],
+    users:[
+      {name:'Iris Bennett',     handle:'@irisbenn',       sessions:9,  streak:10, score:83},
+      {name:'Cole Ward',        handle:'@coleward',       sessions:7,  streak:7,  score:75},
+      {name:'Nora Price',       handle:'@norap',          sessions:5,  streak:5,  score:67},
+      {name:'Elijah Griffin',   handle:'@elijahg',        sessions:4,  streak:3,  score:59},
+      {name:'Stella Foster',    handle:'@sfoster',        sessions:3,  streak:2,  score:51},
+    ], notes:'',
+  },
+  {
+    id:'iss', name:'Indian Springs School', city:'Indian Springs', state:'AL', fips:'01',
+    website:'https://www.indiansprings.org', active:52, prev:44, target:100, history:[28,37,44,52],
+    admin:[{name:'Mr. Raymond Brooks', title:'Head of School', email:'r.brooks@indiansprings.org', phone:'(205) 555-0174'}],
+    users:[
+      {name:'Maya Foster',      handle:'@mayafost',       sessions:6,  streak:7,  score:71},
+      {name:'Tyler Knox',       handle:'@tknox',          sessions:5,  streak:5,  score:63},
+      {name:'Simone Jackson',   handle:'@simonej',        sessions:4,  streak:4,  score:56},
+      {name:'Derek Hill',       handle:'@dhill_opal',     sessions:3,  streak:2,  score:48},
+      {name:'Alexis Waters',    handle:'@awaters',        sessions:2,  streak:2,  score:41},
+    ], notes:'',
+  },
+  {
+    id:'crn', name:'Cranbrook Schools', city:'Bloomfield Hills', state:'MI', fips:'26',
+    website:'https://www.cranbrook.edu', active:91, prev:80, target:100, history:[58,70,80,91],
+    admin:[{name:'Ms. Laura Hendricks', title:'Director of Academics', email:'l.hendricks@cranbrook.edu', phone:'(248) 555-0162'}],
+    users:[
+      {name:'Lily Bergstrom',   handle:'@lilberg',        sessions:9,  streak:10, score:81},
+      {name:'Owen Nakamura',    handle:'@owennaka',       sessions:7,  streak:7,  score:73},
+      {name:'Sophie Chen',      handle:'@sophchen',       sessions:6,  streak:5,  score:65},
+      {name:'Marcus Wiley',     handle:'@mwiley',         sessions:4,  streak:4,  score:57},
+      {name:'Emma Lawson',      handle:'@elawson',        sessions:3,  streak:2,  score:49},
+    ], notes:'',
+  },
+  {
+    id:'pea', name:'Phillips Exeter Academy', city:'Exeter', state:'NH', fips:'33',
+    website:'https://www.exeter.edu', active:126, prev:108, target:100, history:[78,93,108,126],
+    admin:[{name:'Dr. William Rawlings', title:'Dean of Students', email:'w.rawlings@exeter.edu', phone:'(603) 555-0188'}],
+    users:[
+      {name:'James Whitfield',  handle:'@jwhitfield',     sessions:13, streak:15, score:93},
+      {name:'Grace Okafor',     handle:'@graceokafor',    sessions:11, streak:12, score:86},
+      {name:'Kai Tanaka',       handle:'@kaitanaka',      sessions:9,  streak:9,  score:78},
+      {name:'Vivienne Hart',    handle:'@vivihart',       sessions:7,  streak:6,  score:70},
+      {name:'Sebastian Cruz',   handle:'@sebcruz',        sessions:5,  streak:4,  score:62},
+    ], notes:'',
+  },
+  {
+    id:'grt', name:'Groton School', city:'Groton', state:'MA', fips:'25',
+    website:'https://www.groton.org', active:88, prev:76, target:100, history:[51,65,76,88],
+    admin:[{name:'Ms. Patricia Donnelly', title:'Head of Upper School', email:'p.donnelly@groton.org', phone:'(978) 555-0131'}],
+    users:[
+      {name:'Rowan Blackwell',  handle:'@rblackwell',     sessions:8,  streak:9,  score:80},
+      {name:'Isla MacPherson',  handle:'@islamac',        sessions:7,  streak:7,  score:72},
+      {name:'Felix Johansson',  handle:'@felixj',         sessions:5,  streak:5,  score:64},
+      {name:'Thea Caldwell',    handle:'@theacald',       sessions:4,  streak:3,  score:56},
+      {name:'Hugo Laurent',     handle:'@hugolaurent',    sessions:3,  streak:2,  score:48},
+    ], notes:'',
+  },
+  {
+    id:'tnt', name:'The Tatnall School', city:'Wilmington', state:'DE', fips:'10',
+    website:'https://www.tatnall.org', active:63, prev:54, target:100, history:[31,45,54,63],
+    admin:[{name:'Mr. George Ashford', title:'Upper School Principal', email:'g.ashford@tatnall.org', phone:'(302) 555-0157'}],
+    users:[
+      {name:'Maeve Callahan',   handle:'@maevec',         sessions:7,  streak:8,  score:76},
+      {name:'Nate Rivera',      handle:'@naterivera',     sessions:6,  streak:5,  score:68},
+      {name:'Sloane Abbott',    handle:'@sloaneabb',      sessions:4,  streak:4,  score:60},
+      {name:'Declan Ward',      handle:'@declward',       sessions:3,  streak:3,  score:52},
+      {name:'Iris Connelly',    handle:'@irisconn',       sessions:2,  streak:1,  score:44},
+    ], notes:'',
+  },
+];
+
+const ORGANIC_STATES = [
+  {name:'Colorado',      abbr:'CO', fips:'08', users:340, prev:298},
+  {name:'Ohio',          abbr:'OH', fips:'39', users:210, prev:187},
+  {name:'Idaho',         abbr:'ID', fips:'16', users:145, prev:156},
+  {name:'Utah',          abbr:'UT', fips:'49', users:290, prev:251},
+  {name:'South Carolina',abbr:'SC', fips:'45', users:178, prev:162},
+  {name:'Illinois',      abbr:'IL', fips:'17', users:320, prev:289},
+  {name:'Pennsylvania',  abbr:'PA', fips:'42', users:255, prev:271},
+  {name:'North Dakota',  abbr:'ND', fips:'38', users:87,  prev:71},
+  {name:'Arkansas',      abbr:'AR', fips:'05', users:134, prev:118},
+];
+
+const FIPS_NAMES = {
+  '01':'Alabama','02':'Alaska','04':'Arizona','05':'Arkansas','06':'California',
+  '08':'Colorado','09':'Connecticut','10':'Delaware','11':'Washington D.C.','12':'Florida',
+  '13':'Georgia','15':'Hawaii','16':'Idaho','17':'Illinois','18':'Indiana',
+  '19':'Iowa','20':'Kansas','21':'Kentucky','22':'Louisiana','23':'Maine',
+  '24':'Maryland','25':'Massachusetts','26':'Michigan','27':'Minnesota',
+  '28':'Mississippi','29':'Missouri','30':'Montana','31':'Nebraska','32':'Nevada',
+  '33':'New Hampshire','34':'New Jersey','35':'New Mexico','36':'New York',
+  '37':'North Carolina','38':'North Dakota','39':'Ohio','40':'Oklahoma',
+  '41':'Oregon','42':'Pennsylvania','44':'Rhode Island','45':'South Carolina',
+  '46':'South Dakota','47':'Tennessee','48':'Texas','49':'Utah','50':'Vermont',
+  '51':'Virginia','53':'Washington','54':'West Virginia','55':'Wisconsin','56':'Wyoming',
+};
+
+const PARTNER_TARGET = 11;
+
+// ══════════════════════════════════════════════════════════════
+// WEEK NAVIGATOR
+// ══════════════════════════════════════════════════════════════
+
+const WEEKS = [
+  'Apr 13–19, 2026',
+  'Apr 20–26, 2026',
+  'Apr 27 – May 3, 2026',
+  'May 4–10, 2026',
+];
+let selectedWeek = 3;
+
+function getWeekData(school) {
+  const active = school.history ? school.history[selectedWeek] : school.active;
+  const prev   = (school.history && selectedWeek > 0) ? school.history[selectedWeek - 1] : null;
+  return { active, prev };
+}
+
+function prevWeek() {
+  if (selectedWeek <= 0) return;
+  selectedWeek--;
+  updateWeekUI();
+  renderPartner(partnerSort);
+  renderProspective(prospectiveSort);
+}
+function nextWeek() {
+  if (selectedWeek >= 3) return;
+  selectedWeek++;
+  updateWeekUI();
+  renderPartner(partnerSort);
+  renderProspective(prospectiveSort);
+}
+function updateWeekUI() {
+  document.getElementById('week-label').textContent = 'Week of ' + WEEKS[selectedWeek];
+  document.getElementById('btn-prev-week').disabled = selectedWeek <= 0;
+  document.getElementById('btn-next-week').disabled = selectedWeek >= 3;
+}
+
+// ══════════════════════════════════════════════════════════════
+// LOOKUPS & STATUS
+// ══════════════════════════════════════════════════════════════
+
+const partnerFips     = new Set(PARTNER_SCHOOLS.map(s => s.fips));
+const prospectiveFips = new Set(PROSPECTIVE_SCHOOLS.map(s => s.fips));
+const organicFips     = new Set(ORGANIC_STATES.map(s => s.fips));
+
+function stateCategory(fips) {
+  const p = partnerFips.has(fips), q = prospectiveFips.has(fips), o = organicFips.has(fips);
+  if (p && q) return 'both';
+  if (p) return 'partner';
+  if (q) return 'prospective';
+  if (o) return 'organic';
+  return 'none';
+}
+
+function partnerStatus(n) { return n >= 150 ? 'healthy' : n >= 100 ? 'moderate' : 'at-risk'; }
+function prospectiveStatus(n) { return n >= 100 ? 'ready' : n >= 70 ? 'close' : 'not-ready'; }
+
+const STATUS_LABELS = {
+  healthy:'Healthy', moderate:'Moderate', 'at-risk':'At Risk',
+  ready:'Ready to Pitch', close:'Almost Ready', 'not-ready':'Not Ready',
+};
+
+// ══════════════════════════════════════════════════════════════
+// LOCAL STORAGE
+// ══════════════════════════════════════════════════════════════
+
+function lsLoad(id)       { try { const v = localStorage.getItem('opal_'+id); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
+function lsSave(id, data) { try { localStorage.setItem('opal_'+id, JSON.stringify(data)); } catch(e) {} }
+
+function getContacts(school) {
+  const saved = lsLoad(school.id);
+  return (saved && saved.contacts) ? saved.contacts : school.admin;
+}
+function getNotes(school) {
+  const saved = lsLoad(school.id);
+  return (saved && saved.notes !== undefined) ? saved.notes : school.notes;
+}
+
+// ══════════════════════════════════════════════════════════════
+// CARD RENDERING
+// ══════════════════════════════════════════════════════════════
+
+function trendHTML(active, prev) {
+  if (active > prev) return `<span class="card-trend trend-up">↑ ${active-prev} vs last week</span>`;
+  if (active < prev) return `<span class="card-trend trend-down">↓ ${prev-active} vs last week</span>`;
+  return `<span class="card-trend trend-neutral">→ No change</span>`;
+}
+
+function contactsHTML(school) {
+  const contacts = getContacts(school);
+  const items = contacts.map((c, i) => `
+    <div class="contact-item" id="contact-item-${school.id}-${i}">
+      <div class="contact-avatar">${c.name[0]}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-title">${c.title || ''}</div>
+        <div class="contact-detail">${c.email}</div>
+        <div class="contact-detail">${c.phone}</div>
+      </div>
+      <div class="contact-actions">
+        <button class="contact-action-btn" onclick="event.stopPropagation(); editContact('${school.id}',${i})" title="Edit">✏</button>
+        <button class="contact-action-btn" onclick="event.stopPropagation(); deleteContact('${school.id}',${i})" title="Delete">🗑</button>
+      </div>
+    </div>`).join('');
+
+  return `
+    <div class="contacts-list" id="contacts-list-${school.id}">${items}</div>
+    <div class="add-contact-form" id="add-form-${school.id}">
+      <div class="form-row-2">
+        <input class="field-input" id="cf-name-${school.id}" placeholder="Full name">
+        <input class="field-input" id="cf-title-${school.id}" placeholder="Role / Title">
+      </div>
+      <div class="form-row-2">
+        <input class="field-input" id="cf-email-${school.id}" placeholder="Email">
+        <input class="field-input" id="cf-phone-${school.id}" placeholder="Phone">
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" onclick="event.stopPropagation(); saveNewContact('${school.id}')">Add Contact</button>
+        <button class="btn-secondary" onclick="event.stopPropagation(); toggleAddForm('${school.id}', false)">Cancel</button>
+      </div>
+    </div>
+    <button class="add-contact-trigger" id="add-trigger-${school.id}" onclick="event.stopPropagation(); toggleAddForm('${school.id}', true)">+ Add Contact</button>
+    <div class="notes-section">
+      <div class="detail-section-title" style="margin-bottom:8px">Notes</div>
+      <textarea class="field-input field-textarea" id="notes-${school.id}" placeholder="Add notes about this school...">${getNotes(school)}</textarea>
+      <div style="display:flex;align-items:center;margin-top:8px">
+        <button class="btn-primary" onclick="event.stopPropagation(); saveNotes('${school.id}')">Save Notes</button>
+        <span class="save-confirm" id="confirm-${school.id}">Saved ✓</span>
+      </div>
+    </div>`;
+}
+
+function renderCard(school, type) {
+  const {active, prev} = getWeekData(school);
+  const status = type === 'partner' ? partnerStatus(active) : prospectiveStatus(active);
+  const pct    = Math.min((active / school.target) * 100, 100).toFixed(1);
+  const topUser = school.users[0];
+  const isPartner = type === 'partner';
+  const ambLabel = isPartner ? 'Ambassador' : 'Ambassador Candidate';
+
+  const usersHTML = school.users.map((u,i) => `
+    <div class="user-row" onclick="event.stopPropagation(); openProfile('${school.id}',${i})">
+      <div class="user-rank ${i===0?'user-rank-1':''}">${i+1}</div>
+      <div class="user-avatar ${i===0?'user-avatar-ambassador':''}">${u.name[0]}</div>
+      <div style="flex:1">
+        <div class="user-name">${u.name} ${i===0?'<span class="user-star">⭐</span>':''}</div>
+        <div class="user-handle">${u.handle}</div>
+      </div>
+      ${i===0 ? `<span class="badge badge-ambassador">${ambLabel}</span>` : ''}
+    </div>`).join('');
+
+  const trendStr = prev !== null ? trendHTML(active, prev) : '<span class="card-trend trend-neutral">— first week</span>';
+
+  return `
+    <div class="school-card ${status}" id="card-${school.id}">
+      <div class="card-header" onclick="toggleCard('${school.id}')">
+        <div class="card-main">
+          <div class="card-name-row">
+            <div class="card-name">${school.name}</div>
+            <span class="badge badge-${status}">${STATUS_LABELS[status]}</span>
+            <a class="card-website" href="${school.website}" target="_blank" onclick="event.stopPropagation()">↗ website</a>
+            <button class="pitch-card-btn" onclick="openPitchCard('${school.id}',event)">${isPartner ? '📋 Impact' : '📄 Pitch'}</button>
+          </div>
+          <div class="card-location">${school.city}, ${school.state}</div>
+          <div class="card-ambassador-row">
+            <span class="ambassador-star">⭐</span>
+            <span class="ambassador-name">${topUser.name}</span>
+            <span class="ambassador-handle">${topUser.handle}</span>
+            <span class="badge badge-ambassador" style="margin-left:2px">${ambLabel}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill progress-fill-${status}" style="width:${pct}%"></div>
+          </div>
+          <div class="progress-labels">
+            <span>${active} active users</span>
+            <span>target: ${school.target}</span>
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="card-user-count">${active}</div>
+          ${trendStr}
+          <div class="card-meta">this week</div>
+        </div>
+        <div class="card-chevron">▼</div>
+      </div>
+      <div class="card-detail">
+        <div class="card-detail-inner">
+          <div>
+            <div class="detail-section-title">Top Users by Activity</div>
+            <div class="user-list">${usersHTML}</div>
+          </div>
+          <div>
+            <div class="detail-section-title">Admin Contacts</div>
+            ${contactsHTML(school)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONTACT MANAGEMENT
+// ══════════════════════════════════════════════════════════════
+
+function toggleAddForm(id, open) {
+  const form    = document.getElementById('add-form-'+id);
+  const trigger = document.getElementById('add-trigger-'+id);
+  if (!form) return;
+  form.classList.toggle('open', open);
+  trigger.style.display = open ? 'none' : '';
+  if (!open) clearContactForm(id);
+}
+
+function clearContactForm(id) {
+  ['name','title','email','phone'].forEach(f => {
+    const el = document.getElementById(`cf-${f}-${id}`);
+    if (el) el.value = '';
+  });
+}
+
+function saveNewContact(id) {
+  const name  = document.getElementById('cf-name-'+id).value.trim();
+  const title = document.getElementById('cf-title-'+id).value.trim();
+  const email = document.getElementById('cf-email-'+id).value.trim();
+  const phone = document.getElementById('cf-phone-'+id).value.trim();
+  if (!name) return;
+  const school = [...PARTNER_SCHOOLS, ...PROSPECTIVE_SCHOOLS].find(s => s.id === id);
+  const contacts = getContacts(school);
+  contacts.push({name, title, email, phone});
+  const saved = lsLoad(id) || {};
+  saved.contacts = contacts;
+  lsSave(id, saved);
+  // re-render contacts section
+  const list = document.getElementById('contacts-list-'+id);
+  const form = document.getElementById('add-form-'+id);
+  const trigger = document.getElementById('add-trigger-'+id);
+  if (list) list.outerHTML = contactsHTML(school).split('</div>\n    <div class="add-contact-form"')[0] + '</div>';
+  // simplest: just re-render the whole card
+  const card = document.getElementById('card-'+id);
+  if (card) {
+    const type = PARTNER_SCHOOLS.find(s=>s.id===id) ? 'partner' : 'prospective';
+    card.outerHTML = renderCard(school, type);
+    document.getElementById('card-'+id).classList.add('expanded');
+  }
+}
+
+function deleteContact(id, idx) {
+  const school = [...PARTNER_SCHOOLS, ...PROSPECTIVE_SCHOOLS].find(s => s.id === id);
+  const contacts = getContacts(school);
+  if (contacts.length <= 1) return; // keep at least one
+  contacts.splice(idx, 1);
+  const saved = lsLoad(id) || {};
+  saved.contacts = contacts;
+  lsSave(id, saved);
+  const type = PARTNER_SCHOOLS.find(s=>s.id===id) ? 'partner' : 'prospective';
+  const card = document.getElementById('card-'+id);
+  if (card) {
+    card.outerHTML = renderCard(school, type);
+    document.getElementById('card-'+id).classList.add('expanded');
+  }
+}
+
+function editContact(id, idx) {
+  const school   = [...PARTNER_SCHOOLS, ...PROSPECTIVE_SCHOOLS].find(s => s.id === id);
+  const contacts = getContacts(school);
+  const c = contacts[idx];
+  // fill form and show
+  toggleAddForm(id, true);
+  document.getElementById('cf-name-'+id).value  = c.name;
+  document.getElementById('cf-title-'+id).value = c.title || '';
+  document.getElementById('cf-email-'+id).value = c.email;
+  document.getElementById('cf-phone-'+id).value = c.phone;
+  // delete old then save new on submit
+  deleteContact(id, idx);
+}
+
+function saveNotes(id) {
+  const notes = document.getElementById('notes-'+id).value;
+  const saved = lsLoad(id) || {};
+  saved.notes = notes;
+  lsSave(id, saved);
+  const el = document.getElementById('confirm-'+id);
+  el.style.display = 'inline';
+  setTimeout(() => { el.style.display = 'none'; }, 2000);
+}
+
+function toggleCard(id) {
+  document.getElementById('card-'+id).classList.toggle('expanded');
+}
+
+// ══════════════════════════════════════════════════════════════
+// USER PROFILE MODAL
+// ══════════════════════════════════════════════════════════════
+
+function openProfile(schoolId, userIdx) {
+  const school = [...PARTNER_SCHOOLS, ...PROSPECTIVE_SCHOOLS].find(s => s.id === schoolId);
+  const isPartnerSchool = !!PARTNER_SCHOOLS.find(s => s.id === schoolId);
+  const u = school.users[userIdx];
+  const isTopUser = userIdx === 0;
+  const ambLabel = isTopUser ? (isPartnerSchool ? '⭐ Ambassador' : '⭐ Ambassador Candidate') : `#${userIdx+1} at school`;
+  const weeks = [
+    Math.round(u.score * 0.7), Math.round(u.score * 0.8),
+    Math.round(u.score * 0.9), u.score
+  ];
+  const maxW = Math.max(...weeks);
+
+  document.getElementById('profile-body').innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar ${isTopUser?'profile-avatar-ambassador':''}">${u.name[0]}</div>
+      <div>
+        <div class="profile-name">${u.name}</div>
+        <div class="profile-handle">${u.handle}</div>
+        <div class="profile-school">${school.name} · ${school.city}, ${school.state}</div>
+        <div class="profile-badges">
+          <span class="badge badge-${isTopUser?'ambassador':'not-ready'}" style="${isTopUser?'':'color:var(--text-secondary)'}">${ambLabel}</span>
+        </div>
+      </div>
+    </div>
+    <div class="profile-section-title">This Week</div>
+    <div class="profile-metrics">
+      <div class="profile-metric">
+        <div class="profile-metric-value">${u.sessions}</div>
+        <div class="profile-metric-label">Sessions</div>
+      </div>
+      <div class="profile-metric">
+        <div class="profile-metric-value">${u.streak}<span style="font-size:14px;font-weight:400">w</span></div>
+        <div class="profile-metric-label">Active Streak</div>
+      </div>
+      <div class="profile-metric">
+        <div class="profile-metric-value">${u.score}<span style="font-size:14px;font-weight:400">/100</span></div>
+        <div class="profile-metric-label">Activity Score</div>
+      </div>
+    </div>
+    <div class="profile-section-title">Activity — Last 4 Weeks</div>
+    <div class="mini-chart">
+      ${weeks.map(w => `<div class="mini-bar" style="height:${Math.round((w/maxW)*100)}%"></div>`).join('')}
+    </div>
+    <div class="chart-labels">
+      <div class="chart-label">4w ago</div>
+      <div class="chart-label">3w ago</div>
+      <div class="chart-label">2w ago</div>
+      <div class="chart-label">This week</div>
+    </div>`;
+
+  document.getElementById('profile-modal').classList.add('open');
+}
+
+// ══════════════════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════════════════
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showRankingModal(type) {
+  const schools = type === 'partner' ? [...PARTNER_SCHOOLS] : [...PROSPECTIVE_SCHOOLS];
+  schools.sort((a,b) => b.active - a.active);
+  const max = schools[0].active;
+  const label = type === 'partner' ? 'Partner' : 'Prospective';
+
+  document.getElementById('ranking-title').textContent = `${label} Schools — Ranked by Active Users`;
+  document.getElementById('ranking-body').innerHTML = schools.map((s, i) => {
+    const status = type === 'partner' ? partnerStatus(s.active) : prospectiveStatus(s.active);
+    const colors = { healthy:'#16A34A', moderate:'#F59E0B', 'at-risk':'#DC2626', ready:'#16A34A', close:'#F59E0B', 'not-ready':'#3B82F6' };
+    const barPct = ((s.active / max) * 100).toFixed(1);
+    return `<div class="modal-school-row">
+      <div class="modal-rank ${i===0?'modal-rank-1':''}">${i+1}</div>
+      <div class="modal-school-info">
+        <div class="modal-school-name">${s.name}</div>
+        <div class="modal-school-loc">${s.city}, ${s.state}</div>
+      </div>
+      <div class="modal-bar-wrap">
+        <div class="modal-bar-track"><div class="modal-bar-fill" style="width:${barPct}%;background:${colors[status]}"></div></div>
+        <div class="modal-count">${s.active}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('ranking-modal').classList.add('open');
+}
+
+// ══════════════════════════════════════════════════════════════
+// FILTER & SORT
+// ══════════════════════════════════════════════════════════════
+
+let partnerFilter = null, prospectiveFilter = null;
+let partnerSort = 'urgency', prospectiveSort = 'urgency';
+
+function applyFilter(type, status) {
+  if (type === 'partner') { partnerFilter = partnerFilter === status ? null : status; renderPartner(partnerSort); }
+  else { prospectiveFilter = prospectiveFilter === status ? null : status; renderProspective(prospectiveSort); }
+}
+function clearFilter(type) {
+  if (type === 'partner') { partnerFilter = null; renderPartner(partnerSort); }
+  else { prospectiveFilter = null; renderProspective(prospectiveSort); }
+}
+
+function urgencyOrder(school, type) {
+  if (type === 'partner') { const s = partnerStatus(getWeekData(school).active); return s==='at-risk'?0:s==='moderate'?1:2; }
+  const s = prospectiveStatus(getWeekData(school).active); return s==='ready'?0:s==='close'?1:2;
+}
+function sortedSchools(schools, type, mode) {
+  const arr = [...schools];
+  if (mode === 'urgency') arr.sort((a,b) => urgencyOrder(a,type)-urgencyOrder(b,type) || getWeekData(b).active-getWeekData(a).active);
+  else if (mode === 'desc') arr.sort((a,b) => getWeekData(b).active-getWeekData(a).active);
+  else arr.sort((a,b) => getWeekData(a).active-getWeekData(b).active);
+  return arr;
+}
+
+function sortCards(type, mode, btn) {
+  btn.parentElement.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  type === 'partner' ? renderPartner(mode) : renderProspective(mode);
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER VIEWS
+// ══════════════════════════════════════════════════════════════
+
+function renderPartner(mode = 'urgency') {
+  partnerSort = mode;
+  const total   = PARTNER_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
+  const healthy = PARTNER_SCHOOLS.filter(s=>partnerStatus(getWeekData(s).active)==='healthy').length;
+  const atRisk  = PARTNER_SCHOOLS.filter(s=>partnerStatus(getWeekData(s).active)==='at-risk').length;
+  const pct     = ((PARTNER_SCHOOLS.length/PARTNER_TARGET)*100).toFixed(0);
+
+  document.getElementById('partner-stats').innerHTML = `
+    <div class="stat-card clickable" onclick="showRankingModal('partner')">
+      <div class="stat-label">Total Active Users</div>
+      <div class="stat-value">${total.toLocaleString()}</div>
+      <div class="stat-sub">across all partner schools</div>
+      <div class="stat-hint">click to rank by school →</div>
+    </div>
+    <div class="stat-card clickable ${partnerFilter==='healthy'?'filter-active':''}" onclick="applyFilter('partner','healthy')">
+      <div class="stat-label">Healthy</div>
+      <div class="stat-value" style="color:var(--green)">${healthy}</div>
+      <div class="stat-sub">≥150 active users</div>
+      <div class="stat-hint">click to filter →</div>
+    </div>
+    <div class="stat-card clickable ${partnerFilter==='at-risk'?'filter-active':''}" onclick="applyFilter('partner','at-risk')">
+      <div class="stat-label">At Risk</div>
+      <div class="stat-value" style="color:var(--red)">${atRisk}</div>
+      <div class="stat-sub">needs intervention</div>
+      <div class="stat-hint">click to filter →</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2026/27 Pipeline</div>
+      <div class="stat-value">${PARTNER_SCHOOLS.length}<span style="font-size:16px;font-weight:400;color:var(--text-secondary)"> / ${PARTNER_TARGET}</span></div>
+      <div class="target-bar-wrap"><div class="target-track"><div class="target-fill" style="width:${pct}%"></div></div></div>
+      <div class="stat-sub" style="margin-top:5px">${pct}% toward 2026/27 goal</div>
+    </div>`;
+
+  let schools = sortedSchools(PARTNER_SCHOOLS,'partner',mode);
+  if (partnerFilter) schools = schools.filter(s => partnerStatus(getWeekData(s).active) === partnerFilter);
+
+  const pill  = document.getElementById('partner-filter-pill');
+  const label = document.getElementById('partner-count-label');
+  if (partnerFilter) {
+    pill.style.display = 'block';
+    pill.innerHTML = `<div class="filter-pill">${STATUS_LABELS[partnerFilter]} <button onclick="clearFilter('partner')">✕</button></div>`;
+    label.textContent = `${schools.length} of ${PARTNER_SCHOOLS.length} schools`;
+  } else { pill.style.display = 'none'; label.textContent = `${PARTNER_SCHOOLS.length} partner schools`; }
+
+  document.getElementById('partner-cards').innerHTML = schools.map(s=>renderCard(s,'partner')).join('');
+}
+
+function renderProspective(mode = 'urgency') {
+  prospectiveSort = mode;
+  const total = PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
+  const ready = PROSPECTIVE_SCHOOLS.filter(s=>prospectiveStatus(getWeekData(s).active)==='ready').length;
+  const below = PROSPECTIVE_SCHOOLS.length - ready;
+
+  document.getElementById('prospective-stats').innerHTML = `
+    <div class="stat-card clickable" onclick="showRankingModal('prospective')">
+      <div class="stat-label">Total Organic Users</div>
+      <div class="stat-value">${total.toLocaleString()}</div>
+      <div class="stat-sub">across prospective schools</div>
+      <div class="stat-hint">click to rank by school →</div>
+    </div>
+    <div class="stat-card clickable ${prospectiveFilter==='ready'?'filter-active':''}" onclick="applyFilter('prospective','ready')">
+      <div class="stat-label">Ready to Pitch</div>
+      <div class="stat-value" style="color:var(--green)">${ready}</div>
+      <div class="stat-sub">≥100 active users</div>
+      <div class="stat-hint">click to filter →</div>
+    </div>
+    <div class="stat-card clickable ${prospectiveFilter==='building'?'filter-active':''}" onclick="applyFilter('prospective','building')">
+      <div class="stat-label">Building Momentum</div>
+      <div class="stat-value">${below}</div>
+      <div class="stat-sub">below threshold</div>
+      <div class="stat-hint">click to filter →</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2026/27 Target</div>
+      <div class="stat-value">10–12</div>
+      <div class="stat-sub">partner schools total</div>
+    </div>`;
+
+  let schools = sortedSchools(PROSPECTIVE_SCHOOLS,'prospective',mode);
+  if (prospectiveFilter === 'ready') schools = schools.filter(s=>prospectiveStatus(getWeekData(s).active)==='ready');
+  else if (prospectiveFilter === 'building') schools = schools.filter(s=>prospectiveStatus(getWeekData(s).active)!=='ready');
+
+  const pill  = document.getElementById('prospective-filter-pill');
+  const label = document.getElementById('prospective-count-label');
+  if (prospectiveFilter) {
+    pill.style.display = 'block';
+    const pillLabel = prospectiveFilter === 'ready' ? 'Ready to Pitch' : 'Building Momentum';
+    pill.innerHTML = `<div class="filter-pill">${pillLabel} <button onclick="clearFilter('prospective')">✕</button></div>`;
+    label.textContent = `${schools.length} of ${PROSPECTIVE_SCHOOLS.length} schools`;
+  } else { pill.style.display = 'none'; label.textContent = `${PROSPECTIVE_SCHOOLS.length} prospective schools`; }
+
+  document.getElementById('prospective-cards').innerHTML = schools.map(s=>renderCard(s,'prospective')).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// VIEW SWITCHING
+// ══════════════════════════════════════════════════════════════
+
+function switchView(view, btn) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  btn.classList.add('active');
+  if (view === 'map') { initMap(); updateStateReach(); }
+  if (view === 'ambassadors') renderAmbassadors();
+}
+
+// ══════════════════════════════════════════════════════════════
+// PITCH CARD
+// ══════════════════════════════════════════════════════════════
+
+function openPitchCard(schoolId, event) {
+  event.stopPropagation();
+  const school = [...PARTNER_SCHOOLS, ...PROSPECTIVE_SCHOOLS].find(s => s.id === schoolId);
+  const isPartner = !!PARTNER_SCHOOLS.find(s => s.id === schoolId);
+  const {active, prev} = getWeekData(school);
+  const topUser = school.users[0];
+  const diff = prev !== null ? active - prev : null;
+
+  const diffHTML = diff !== null
+    ? `<div class="pitch-trend ${diff>0?'trend-up':diff<0?'trend-down':'trend-neutral'}">${diff>0?'↑':diff<0?'↓':'→'} ${Math.abs(diff)} ${diff>0?'gained from':'lost from'} last week</div>`
+    : '';
+
+  document.getElementById('pitch-school-name').textContent = school.name;
+  document.getElementById('pitch-school-loc').textContent  = `${school.city}, ${school.state}`;
+
+  const body = document.getElementById('pitch-body');
+
+  if (isPartner) {
+    const pct = ((active / school.target) * 100).toFixed(0);
+    const story = diff > 0
+      ? `Growing ${((diff/(prev||1))*100).toFixed(0)}% week-over-week.`
+      : diff < 0 ? `Down ${Math.abs(diff)} users from last week — worth a check-in.`
+      : 'Holding steady this week.';
+    body.innerHTML = `
+      <div class="pitch-type-badge pitch-type-impact">Impact Summary</div>
+      <div class="pitch-hero-num">${active.toLocaleString()}</div>
+      <div class="pitch-hero-lbl">active students this week</div>
+      ${diffHTML}
+      <hr class="pitch-divider">
+      <div class="pitch-amb-row">
+        <div class="pitch-amb-avatar">${topUser.name[0]}</div>
+        <div>
+          <div class="pitch-amb-name">⭐ ${topUser.name}</div>
+          <div class="pitch-amb-handle">${topUser.handle}</div>
+          <div class="pitch-amb-stats">Score ${topUser.score}/100 · ${topUser.streak}-week streak · ${topUser.sessions} sessions</div>
+        </div>
+      </div>
+      <div class="pitch-hook">"${school.name} has ${active} active students this week — ${pct >= 100 ? `${pct}% of` : `reaching toward`} the 150-user benchmark. ${story}"</div>
+      <button class="pitch-print-btn" onclick="window.print()">⎙ Print / Save as PDF</button>`;
+  } else {
+    const overThreshold = active >= 100;
+    body.innerHTML = `
+      <div class="pitch-type-badge pitch-type-pitch">Pitch Brief</div>
+      <div class="pitch-hero-num">${active.toLocaleString()}</div>
+      <div class="pitch-hero-lbl">students using Opal without admin support</div>
+      ${diffHTML}
+      <hr class="pitch-divider">
+      <div class="pitch-amb-row">
+        <div class="pitch-amb-avatar">${topUser.name[0]}</div>
+        <div>
+          <div class="pitch-amb-name">⭐ ${topUser.name}</div>
+          <div class="pitch-amb-handle">${topUser.handle}</div>
+          <div class="pitch-amb-stats">Score ${topUser.score}/100 · ${topUser.streak}-week streak · ${topUser.sessions} sessions</div>
+        </div>
+      </div>
+      <div class="pitch-hook">${overThreshold
+        ? `"${active} students at ${school.name} are already using Opal — without any admin support. 100 active users is enough to start the conversation. You're already there."`
+        : `"${active} students at ${school.name} are using Opal without any admin support and building momentum fast. The 100-user threshold to start the conversation is within reach."`
+      }</div>
+      <button class="pitch-print-btn" onclick="window.print()">⎙ Print / Save as PDF</button>`;
+  }
+
+  document.getElementById('pitch-modal').classList.add('open');
+}
+
+// ══════════════════════════════════════════════════════════════
+// AMBASSADOR TAB
+// ══════════════════════════════════════════════════════════════
+
+function renderAmbassadors() {
+  const confirmedHTML = PARTNER_SCHOOLS.map(s => {
+    const u = s.users[0];
+    return `<div class="amb-card confirmed" onclick="openProfile('${s.id}',0)">
+      <div class="amb-avatar confirmed">${u.name[0]}</div>
+      <div class="amb-info">
+        <div class="amb-name">${u.name} <span class="badge badge-ambassador">Ambassador</span></div>
+        <div class="amb-handle">${u.handle}</div>
+        <div class="amb-school">${s.name} · ${s.city}, ${s.state}</div>
+      </div>
+      <div class="amb-metrics">
+        <div class="amb-metric"><div class="amb-metric-val">${u.score}</div><div class="amb-metric-lbl">Score</div></div>
+        <div class="amb-metric"><div class="amb-metric-val">${u.streak}w</div><div class="amb-metric-lbl">Streak</div></div>
+        <div class="amb-metric"><div class="amb-metric-val">${u.sessions}</div><div class="amb-metric-lbl">Sessions</div></div>
+      </div>
+      <button class="amb-contact-btn" onclick="event.stopPropagation()" title="Contact ${u.name}">✉ Contact</button>
+    </div>`;
+  }).join('');
+
+  const candidatesHTML = PROSPECTIVE_SCHOOLS.map(s => {
+    const u = s.users[0];
+    const wd = getWeekData(s);
+    const status = prospectiveStatus(wd.active);
+    return `<div class="amb-card candidate" onclick="openProfile('${s.id}',0)">
+      <div class="amb-avatar candidate">${u.name[0]}</div>
+      <div class="amb-info">
+        <div class="amb-name">${u.name} <span class="badge" style="background:#DBEAFE;color:#1D4ED8;font-size:9px">Candidate</span></div>
+        <div class="amb-handle">${u.handle}</div>
+        <div class="amb-school">${s.name} · ${s.city}, ${s.state} &nbsp;<span class="badge badge-${status}" style="font-size:9px">${STATUS_LABELS[status]}</span></div>
+      </div>
+      <div class="amb-metrics">
+        <div class="amb-metric"><div class="amb-metric-val">${u.score}</div><div class="amb-metric-lbl">Score</div></div>
+        <div class="amb-metric"><div class="amb-metric-val">${u.streak}w</div><div class="amb-metric-lbl">Streak</div></div>
+        <div class="amb-metric"><div class="amb-metric-val">${u.sessions}</div><div class="amb-metric-lbl">Sessions</div></div>
+      </div>
+      <button class="amb-contact-btn" onclick="event.stopPropagation()" title="Contact ${u.name}">✉ Contact</button>
+    </div>`;
+  }).join('');
+
+  const readyCount = PROSPECTIVE_SCHOOLS.filter(s => prospectiveStatus(getWeekData(s).active) === 'ready').length;
+
+  document.getElementById('ambassadors-content').innerHTML = `
+    <div class="stats-bar" style="margin-bottom:24px">
+      <div class="stat-card">
+        <div class="stat-label">Confirmed Ambassadors</div>
+        <div class="stat-value">${PARTNER_SCHOOLS.length}</div>
+        <div class="stat-sub">one per partner school</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ambassador Candidates</div>
+        <div class="stat-value">${PROSPECTIVE_SCHOOLS.length}</div>
+        <div class="stat-sub">top users at prospective schools</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Schools Ready to Convert</div>
+        <div class="stat-value" style="color:var(--green)">${readyCount}</div>
+        <div class="stat-sub">≥100 active users</div>
+      </div>
+    </div>
+    <div class="amb-section-lbl">Confirmed Ambassadors — Partner Schools</div>
+    <div class="amb-grid">${confirmedHTML}</div>
+    <div class="amb-section-lbl">Ambassador Candidates — Prospective Schools</div>
+    <div class="amb-grid">${candidatesHTML}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// MAP
+// ══════════════════════════════════════════════════════════════
+
+let mapReady = false;
+
+function stateFill(fips) {
+  const cat = stateCategory(fips);
+  if (cat === 'both')        return 'url(#scribble)';
+  if (cat === 'partner')     return 'var(--map-partner)';
+  if (cat === 'prospective') return 'var(--map-prospective)';
+  if (cat === 'organic')     return 'var(--map-organic)';
+  return 'var(--map-none)';
+}
+function stateHover(fips) {
+  const cat = stateCategory(fips);
+  if (cat === 'partner' || cat === 'both') return '#8DC86A';
+  if (cat === 'prospective') return '#6FA8CC';
+  if (cat === 'organic')     return '#A07AB8';
+  return '#D1D5DB';
+}
+
+const CAT_LABELS = {
+  partner:'Partner School', prospective:'Prospective School',
+  both:'Partner + Prospective', organic:'Organic Users', none:'No Activity',
+};
+
+function panelSchoolHTML(s, type) {
+  const status = type === 'partner' ? partnerStatus(s.active) : prospectiveStatus(s.active);
+  const bg = type === 'prospective' ? 'background:#EFF6FF;border:1px solid #DBEAFE;' : '';
+  const usersHTML = s.users.map((u,i) => `
+    <div class="panel-user-row" onclick="openProfile('${s.id}',${i})">
+      <div class="panel-user-rank ${i===0?'panel-user-rank-1':''}">${i+1}</div>
+      <div>
+        <span class="panel-user-name">${u.name}</span>${i===0?' ⭐':''}
+        <span class="panel-user-handle" style="margin-left:5px">${u.handle}</span>
+      </div>
+    </div>`).join('');
+  return `<div class="panel-school-item" id="psi-${s.id}">
+    <div class="panel-school-header" onclick="togglePanelSchool('${s.id}')">
+      <div>
+        <div class="panel-school-name">${s.name}</div>
+        <div class="panel-school-sub">${s.active} active users &nbsp;<span class="badge badge-${status}" style="font-size:9px">${STATUS_LABELS[status]}</span></div>
+      </div>
+      <div class="panel-chevron">▼</div>
+    </div>
+    <div class="panel-school-detail" style="${bg}">
+      ${usersHTML}
+      <a class="panel-website-link" href="${s.website}" target="_blank">↗ Visit school website</a>
+    </div>
+  </div>`;
+}
+
+function buildPanel(fips) {
+  const partners  = PARTNER_SCHOOLS.filter(s=>s.fips===fips);
+  const prospects = PROSPECTIVE_SCHOOLS.filter(s=>s.fips===fips);
+  const organic   = ORGANIC_STATES.find(s=>s.fips===fips);
+  const cat       = stateCategory(fips);
+  let html = '';
+  if (partners.length)  html += `<div><div class="panel-section-title">Partner Schools</div>${partners.map(s=>panelSchoolHTML(s,'partner')).join('')}</div>`;
+  if (prospects.length) html += `<div><div class="panel-section-title">Prospective Schools</div>${prospects.map(s=>panelSchoolHTML(s,'prospective')).join('')}</div>`;
+  if (organic) {
+    const up = organic.users > organic.prev, diff = Math.abs(organic.users-organic.prev);
+    html += `<div><div class="panel-section-title">Organic Activity</div>
+      <div class="panel-organic-box">
+        <div class="panel-organic-count">${organic.users.toLocaleString()}</div>
+        <div class="panel-organic-label">organic users this week</div>
+        <div style="margin-top:6px;font-size:12px;font-weight:500" class="${up?'trend-up':'trend-down'}">${up?'↑':'↓'} ${diff} vs last week</div>
+      </div></div>`;
+  }
+  if (cat === 'none') html = `<div class="panel-empty">No Opal activity detected here yet.</div>`;
+  return html;
+}
+
+function togglePanelSchool(id) { document.getElementById('psi-'+id).classList.toggle('expanded'); }
+
+async function initMap() {
+  if (mapReady) return;
+  mapReady = true;
+  const container = document.querySelector('.map-container');
+  const W = container.clientWidth, H = container.clientHeight;
+  const svg = d3.select('#us-map').attr('width',W).attr('height',H);
+
+  const defs = svg.append('defs');
+  const pat  = defs.append('pattern').attr('id','scribble').attr('patternUnits','userSpaceOnUse').attr('width',10).attr('height',10).attr('patternTransform','rotate(45)');
+  pat.append('rect').attr('width',5).attr('height',10).attr('fill','#BAED91');
+  pat.append('rect').attr('x',5).attr('width',5).attr('height',10).attr('fill','#9DCAEB');
+
+  const proj = d3.geoAlbersUsa().scale(W*1.1).translate([W/2,H/2]);
+  const path = d3.geoPath().projection(proj);
+  const tip  = document.getElementById('tooltip');
+
+  try {
+    const us     = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
+    const states = topojson.feature(us, us.objects.states);
+    svg.append('g').selectAll('path').data(states.features).join('path')
+      .attr('d', path)
+      .attr('fill', d => stateFill(d.id.toString().padStart(2,'0')))
+      .attr('stroke','white').attr('stroke-width',0.8)
+      .style('cursor','pointer')
+      .on('mousemove', function(event, d) {
+        const fips = d.id.toString().padStart(2,'0');
+        const name = FIPS_NAMES[fips]||'';
+        const cat  = stateCategory(fips);
+        tip.style.display = 'block';
+        tip.style.left = (event.clientX+14)+'px';
+        tip.style.top  = (event.clientY-36)+'px';
+        tip.textContent = name + (cat!=='none'?' · '+CAT_LABELS[cat]:'');
+        d3.select(this).attr('fill', stateHover(fips));
+      })
+      .on('mouseleave', function(event,d) {
+        const fips = d.id.toString().padStart(2,'0');
+        d3.select(this).attr('fill', stateFill(fips));
+        tip.style.display = 'none';
+      })
+      .on('click', function(event,d) {
+        const fips = d.id.toString().padStart(2,'0');
+        const name = FIPS_NAMES[fips]||'';
+        const cat  = stateCategory(fips);
+        document.getElementById('panel-state-name').textContent = name;
+        document.getElementById('panel-state-type').textContent = CAT_LABELS[cat];
+        document.getElementById('panel-body').innerHTML = buildPanel(fips);
+        document.getElementById('map-panel').classList.add('open');
+      });
+  } catch(e) {
+    svg.append('text').attr('x',W/2).attr('y',H/2).attr('text-anchor','middle').attr('font-size',14).attr('fill','#888').text('Map could not load — check your internet connection.');
+  }
+}
+
+function closePanel() { document.getElementById('map-panel').classList.remove('open'); }
+
+function toggleLegend() {
+  const body = document.getElementById('legend-body');
+  const btn  = document.getElementById('legend-toggle');
+  const collapsed = body.classList.toggle('collapsed');
+  btn.classList.toggle('collapsed', collapsed);
+  btn.title = collapsed ? 'Expand legend' : 'Collapse legend';
+}
+
+function updateStateReach() {
+  const active = new Set([
+    ...PARTNER_SCHOOLS.map(s => s.fips),
+    ...PROSPECTIVE_SCHOOLS.map(s => s.fips),
+    ...ORGANIC_STATES.map(s => s.fips),
+  ]).size;
+  const el = document.getElementById('state-reach-stat');
+  const sub = document.getElementById('state-reach-sub');
+  if (el) el.textContent = `${active} / 50 states`;
+  if (sub) sub.textContent = 'with Opal activity';
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+
+renderPartner();
+renderProspective();
+updateWeekUI();
+
+</script>
+</body>
+</html>
