@@ -1674,6 +1674,17 @@ function goToView(view) {
   const btn = [...document.querySelectorAll('.tab-btn')].find(b=>(b.getAttribute('onclick')||'').includes("'"+view+"'"));
   if (btn) switchView(view, btn);
 }
+function goToSchoolCard(schoolId) {
+  goToView('prospective');
+  setTimeout(() => {
+    const card = document.getElementById('card-' + schoolId);
+    if (!card) return;
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.style.transition = 'box-shadow 0.3s';
+    card.style.boxShadow = '0 0 0 2px var(--green)';
+    setTimeout(() => { card.style.boxShadow = ''; }, 1800);
+  }, 120);
+}
 function renderOverview() {
   const totalPartner = PARTNER_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
   const totalProspective = PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
@@ -1692,50 +1703,18 @@ function renderOverview() {
       <div style="font-size:12px;color:var(--text-tertiary);margin-top:8px">${sub}</div>
       <div style="font-size:11px;color:var(--text-tertiary);margin-top:10px;opacity:0.5">View →</div>
     </div>`;
-  // Compute 4-week school totals (partner + prospective, using history)
-  const weekTotals = [0,1,2,3].map(w => {
-    const saved = selectedWeek;
-    // temporarily calculate for each week index
-    const p = PARTNER_SCHOOLS.reduce((s,x) => s + (x.history ? x.history[w] : x.active), 0);
-    const q = PROSPECTIVE_SCHOOLS.reduce((s,x) => s + (x.history ? x.history[w] : x.active), 0);
-    return p + q;
-  });
-  const growth = weekTotals[3] - weekTotals[0];
-  const growthPct = Math.round((growth / weekTotals[0]) * 100);
-  const barMax = Math.max(...weekTotals);
-  const barH = 48;
-  const barW = 40;
-  const gap = 24;
-  const svgW = 4 * barW + 3 * gap;
-  const bars = weekTotals.map((v, i) => {
-    const h = Math.round((v / barMax) * barH);
-    const x = i * (barW + gap);
-    const isActive = i === 3;
-    return `<g>
-      <rect x="${x}" y="${barH - h}" width="${barW}" height="${h}" rx="4"
-        fill="${isActive ? 'var(--green)' : '#D1D5DB'}"/>
-      <text x="${x + barW/2}" y="${barH + 14}" text-anchor="middle"
-        font-size="9" fill="var(--text-tertiary)" font-family="Inter,sans-serif">${WEEKS[i].split(',')[0]}</text>
-      <text x="${x + barW/2}" y="${barH - h - 5}" text-anchor="middle"
-        font-size="9" fill="${isActive ? 'var(--green)' : 'var(--text-tertiary)'}" font-weight="${isActive?'700':'400'}"
-        font-family="Inter,sans-serif">${v.toLocaleString()}</text>
-    </g>`;
-  }).join('');
-  const trendCard = `
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 32px;width:100%;box-sizing:border-box;margin-top:4px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-tertiary)">Student Growth — 4 Weeks</div>
-        <div style="font-size:13px;font-weight:700;color:var(--green)">↑ +${growth.toLocaleString()} students &nbsp;<span style="font-weight:400;color:var(--text-tertiary)">(+${growthPct}% in 4 weeks)</span></div>
-      </div>
-      <svg width="${svgW}" height="${barH + 24}" style="display:block;margin:0 auto;overflow:visible">${bars}</svg>
-    </div>`;
+  const w0 = PARTNER_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[0]:x.active),0)
+           + PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[0]:x.active),0);
+  const w3 = PARTNER_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[3]:x.active),0)
+           + PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[3]:x.active),0);
+  const growthPct = Math.round(((w3-w0)/w0)*100);
   document.getElementById('overview-stats').innerHTML = `
     <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%">
       ${card('partner', PARTNER_SCHOOLS.length, 'Partner Schools', 'active this week')}
       ${card('map', total.toLocaleString(), 'Active Students', 'across all tracked states')}
       ${card('prospective', ready, 'Ready to Pitch', '≥100 organic users', 'var(--green)')}
-    </div>
-    ${trendCard}`;
+      ${card('map', '+'+growthPct+'%', '4-Week Growth', 'across tracked schools', 'var(--green)')}
+    </div>`;
 }
 
 function switchView(view, btn) {
@@ -1882,7 +1861,7 @@ function renderAmbassadors() {
 
   const readyListHTML = readySchools.length ? readySchools.map(s => {
     const candidate = s.users[0];
-    return `<div onclick="goToView('prospective')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer"
+    return `<div onclick="goToSchoolCard('${s.id}')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer"
       onmouseenter="this.style.background='var(--bg)'" onmouseleave="this.style.background=''">
       <div>
         <span style="font-weight:600">→ ${candidate.name}</span>
