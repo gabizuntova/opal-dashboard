@@ -1703,17 +1703,45 @@ function renderOverview() {
       <div style="font-size:12px;color:var(--text-tertiary);margin-top:8px">${sub}</div>
       <div style="font-size:11px;color:var(--text-tertiary);margin-top:10px;opacity:0.5">View →</div>
     </div>`;
-  const w0 = PARTNER_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[0]:x.active),0)
-           + PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[0]:x.active),0);
-  const w3 = PARTNER_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[3]:x.active),0)
-           + PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[3]:x.active),0);
-  const growthPct = Math.round(((w3-w0)/w0)*100);
+  const totalAmb = PARTNER_SCHOOLS.length + PROSPECTIVE_SCHOOLS.length;
+  // week-over-week change for total (schools only)
+  const prevTotal = PARTNER_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[2]:x.active),0)
+                  + PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[2]:x.active),0)
+                  + ORGANIC_STATES.reduce((s,x)=>s+(x.history?x.history[2]:(x.prev||x.users)),0);
+  const wowDiff = total - prevTotal;
+  const wowPct = Math.round(((total-prevTotal)/prevTotal)*100);
+  const wowStr = (wowDiff>=0?'+':'')+wowDiff.toLocaleString()+' ('+(wowPct>=0?'+':'')+wowPct+'% vs last week)';
+  // sparkline for total (4 weeks, schools only for simplicity)
+  const weekTotals = [0,1,2,3].map(w=>
+    PARTNER_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[w]:x.active),0)
+    + PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[w]:x.active),0)
+    + ORGANIC_STATES.reduce((s,x)=>s+(x.history?x.history[w]:(w===3?x.users:x.prev||x.users)),0)
+  );
+  const spW=200, spH=40;
+  const spMin=Math.min(...weekTotals), spMax=Math.max(...weekTotals), spRange=spMax-spMin||1;
+  const spPts = weekTotals.map((v,i)=>`${(i/3*spW).toFixed(1)},${(spH-((v-spMin)/spRange)*(spH-6)-3).toFixed(1)}`).join(' ');
+  const sparkline = `<svg width="${spW}" height="${spH}" style="display:block;margin:10px auto 0" viewBox="0 0 ${spW} ${spH}">
+    <polyline points="${spPts}" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${spW}" cy="${(spH-((weekTotals[3]-spMin)/spRange)*(spH-6)-3).toFixed(1)}" r="3" fill="var(--green)"/>
+  </svg>`;
   document.getElementById('overview-stats').innerHTML = `
     <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%">
       ${card('partner', PARTNER_SCHOOLS.length, 'Partner Schools', 'active this week')}
-      ${card('map', total.toLocaleString(), 'Active Students', 'across all tracked states')}
-      ${card('prospective', ready, 'Ready to Pitch', '≥100 organic users', 'var(--green)')}
-      ${card('map', '+'+growthPct+'%', '4-Week Growth', 'across tracked schools', 'var(--green)')}
+      ${card('prospective', ready, 'Schools Ready to Pitch', '≥100 organic users', 'var(--green)')}
+      ${card('ambassadors', totalAmb, 'Student Leads', PARTNER_SCHOOLS.length+' ambassadors · '+PROSPECTIVE_SCHOOLS.length+' candidates')}
+    </div>
+    <div onclick="goToView('map')" style="cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;width:100%;box-sizing:border-box;margin-top:0;transition:box-shadow 0.15s,transform 0.15s"
+      onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)';this.style.transform='translateY(-2px)'"
+      onmouseleave="this.style.boxShadow='';this.style.transform=''">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px">
+        <div>
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-tertiary);margin-bottom:8px">Teenage Users Across the US</div>
+          <div style="font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1">${total.toLocaleString()}</div>
+          <div style="font-size:13px;color:var(--green);font-weight:500;margin-top:6px">${wowStr}</div>
+        </div>
+        <div style="flex:1;min-width:200px">${sparkline}</div>
+      </div>
+      <div style="font-size:11px;color:var(--text-tertiary);margin-top:12px;opacity:0.5">View map →</div>
     </div>`;
 }
 
