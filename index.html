@@ -1733,10 +1733,16 @@ function renderOverview() {
   const spW=200, spH=40;
   const spMin=Math.min(...weekTotals), spMax=Math.max(...weekTotals), spRange=spMax-spMin||1;
   const spPts = weekTotals.map((v,i)=>`${(i/3*spW).toFixed(1)},${(spH-((v-spMin)/spRange)*(spH-6)-3).toFixed(1)}`).join(' ');
-  const sparkline = `<svg width="${spW}" height="${spH}" style="display:block;margin:10px auto 0" viewBox="0 0 ${spW} ${spH}">
-    <polyline points="${spPts}" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="${spW}" cy="${(spH-((weekTotals[3]-spMin)/spRange)*(spH-6)-3).toFixed(1)}" r="3" fill="var(--green)"/>
-  </svg>`;
+  const spEndY = (spH-((weekTotals[3]-spMin)/spRange)*(spH-6)-3).toFixed(1);
+  const sparkline = `<div style="display:flex;flex-direction:column;align-items:stretch;flex:1;min-width:200px">
+    <svg width="100%" height="${spH}" style="display:block" viewBox="0 0 ${spW} ${spH}" preserveAspectRatio="none">
+      <polyline points="${spPts}" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${spW}" cy="${spEndY}" r="3" fill="var(--green)"/>
+    </svg>
+    <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--text-tertiary)">
+      <span>Apr 13</span><span>Apr 20</span><span>Apr 27</span><span style="color:var(--green);font-weight:600">May 4–10</span>
+    </div>
+  </div>`;
   document.getElementById('overview-stats').innerHTML = `
     <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%">
       ${card('partner', PARTNER_SCHOOLS.length, 'Partner Schools', 'active this week')}
@@ -1856,7 +1862,8 @@ function renderAmbassadors(filter) {
     const badge = type==='ambassador'
       ? `<span class="badge badge-ambassador" style="font-size:9px">Ambassador</span>`
       : `<span class="badge badge-${status}" style="font-size:9px">${STATUS_LABELS[status]}</span>`;
-    return `<div class="amb-row" onclick="openProfile('${school.id}',0)">
+    const clickAction = (type==='candidate' && status==='ready') ? `goToSchoolCard('${school.id}')` : `openProfile('${school.id}',0)`;
+    return `<div class="amb-row" onclick="${clickAction}">
       <div class="amb-row-avatar ${type}">${user.name[0]}</div>
       <div class="amb-row-name">${user.name}</div>
       <div class="amb-row-meta">${user.grade ? 'Grade '+user.grade : ''} · ${user.handle}</div>
