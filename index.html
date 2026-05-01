@@ -622,20 +622,11 @@ header {
 
 <!-- OVERVIEW -->
 <div id="view-overview" class="view active">
-  <div style="max-width:680px;margin:64px auto 0;padding:0 32px">
-    <div style="font-size:28px;font-weight:700;letter-spacing:-0.8px;margin-bottom:10px">Opal School Partnership Dashboard</div>
-    <div style="font-size:15px;color:var(--text-secondary);line-height:1.6;margin-bottom:40px">A live CRM and sales intelligence tool tracking Opal student activity across the United States — managing active school partnerships and identifying the next ones through organic student usage.</div>
-    <div class="stats-bar" id="overview-stats"></div>
-    <div style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <div style="padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid var(--green)">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:8px">Customer Success</div>
-        <div style="font-size:13px;color:var(--text);line-height:1.6">Monitor engagement health across 7 active partner schools — tracking weekly active users, flagging at-risk accounts, and managing admin contacts.</div>
-      </div>
-      <div style="padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid #3B82F6">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:8px">Sales Pipeline</div>
-        <div style="font-size:13px;color:var(--text);line-height:1.6">Identify schools where students are already using Opal without admin support — and surface the student ambassadors who can lead the pitch from the inside.</div>
-      </div>
-    </div>
+  <div style="max-width:640px;margin:80px auto 0;padding:0 32px;text-align:center">
+    <div style="font-size:13px;font-weight:500;color:var(--text-tertiary);letter-spacing:0.3px;margin-bottom:10px">Welcome to the</div>
+    <div style="font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1.15;margin-bottom:28px">Opal School Partnership Dashboard</div>
+    <div style="font-size:15px;color:var(--text-secondary);margin-bottom:48px" id="overview-week-label">Here is what our customer success + sales pipeline looks like this week:</div>
+    <div class="stats-bar" id="overview-stats" style="justify-content:center"></div>
   </div>
 </div>
 
@@ -1648,11 +1639,14 @@ function renderProspective(mode = 'urgency') {
 function renderOverview() {
   const totalPartner = PARTNER_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
   const totalProspective = PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
+  const totalOrganic = ORGANIC_STATES.reduce((s,x)=>s+x.users,0);
   const stateCount = new Set([...PARTNER_SCHOOLS.map(s=>s.fips),...PROSPECTIVE_SCHOOLS.map(s=>s.fips),...ORGANIC_STATES.map(s=>s.fips)]).size;
   const ready = PROSPECTIVE_SCHOOLS.filter(s=>prospectiveStatus(getWeekData(s).active)==='ready').length;
+  const weekEl = document.getElementById('overview-week-label');
+  if (weekEl) weekEl.textContent = `Here is what our customer success + sales pipeline looks like this week (${WEEKS[weekIndex]}):`;
   document.getElementById('overview-stats').innerHTML = `
     <div class="stat-card"><div class="stat-label">Partner Schools</div><div class="stat-value">${PARTNER_SCHOOLS.length}</div><div class="stat-sub">active this week</div></div>
-    <div class="stat-card"><div class="stat-label">Total Active Users</div><div class="stat-value">${(totalPartner+totalProspective).toLocaleString()}</div><div class="stat-sub">across all tracked schools</div></div>
+    <div class="stat-card"><div class="stat-label">Total Active Users</div><div class="stat-value">${(totalPartner+totalProspective+totalOrganic).toLocaleString()}</div><div class="stat-sub">across all tracked states</div></div>
     <div class="stat-card"><div class="stat-label">States Active</div><div class="stat-value">${stateCount}<span style="font-size:16px;font-weight:400;color:var(--text-secondary)"> / 50</span></div><div class="stat-sub">organic + partner + pipeline</div></div>
     <div class="stat-card"><div class="stat-label">Ready to Pitch</div><div class="stat-value" style="color:var(--green)">${ready}</div><div class="stat-sub">≥100 organic users</div></div>`;
 }
