@@ -1172,27 +1172,18 @@ function renderAlerts() {
 function renderProspectiveAlerts() {
   const el = document.getElementById('prospective-alert-strip');
   if (!el) return;
-  const alerts = [];
-  PROSPECTIVE_SCHOOLS.forEach(s => {
-    const {active, prev} = getWeekData(s);
-    const status = prospectiveStatus(active);
-    const candidate = s.users[0];
-    const declining = prev !== null && active < prev;
-    const gap = 100 - active;
-    if (status === 'ready') {
-      alerts.push({ dot: 'green', msg: `<strong>${s.name}</strong> just crossed 100 users — start the conversation this week. Ambassador candidate: ${candidate.name} (${candidate.handle})` });
-    } else if (status === 'close' && declining) {
-      alerts.push({ dot: 'red', msg: `Momentum slipping at <strong>${s.name}</strong> — down ${prev - active} this week. Reach out to ${candidate.name} before you lose the window.` });
-    } else if (status === 'close' && !declining) {
-      alerts.push({ dot: 'amber', msg: `<strong>${s.name}</strong> is ${gap} users away from the threshold. Consider engaging ${candidate.name} to help drive adoption.` });
-    } else if (status === 'not-ready' && prev !== null && (active - prev) >= 8) {
-      alerts.push({ dot: 'amber', msg: `<strong>${s.name}</strong> is picking up fast (+${active - prev} this week) — worth watching.` });
-    }
-  });
-  if (alerts.length === 0) { el.innerHTML = ''; return; }
+  const ready = PROSPECTIVE_SCHOOLS.filter(s => prospectiveStatus(getWeekData(s).active) === 'ready');
+  const building = PROSPECTIVE_SCHOOLS.filter(s => prospectiveStatus(getWeekData(s).active) !== 'ready');
+  if (ready.length === 0 && building.length === 0) { el.innerHTML = ''; return; }
+  const readyLine = ready.length
+    ? `<div class="alert-row"><div class="alert-dot alert-dot-green"></div><span><strong>${ready.length} school${ready.length>1?'s':''} ready to pitch:</strong> ${ready.map(s=>s.name).join(' · ')}</span></div>`
+    : '';
+  const buildingLine = building.length
+    ? `<div class="alert-row"><div class="alert-dot alert-dot-amber"></div><span>${building.length} building toward the threshold</span></div>`
+    : '';
   el.innerHTML = `<div class="alert-strip" style="background:#F0FDF4;border-color:#BBF7D0">
     <div class="alert-strip-title" style="color:#14532D">Pipeline activity</div>
-    ${alerts.map(a => `<div class="alert-row"><div class="alert-dot alert-dot-${a.dot}"></div><span>${a.msg}</span></div>`).join('')}
+    ${readyLine}${buildingLine}
   </div>`;
 }
 
