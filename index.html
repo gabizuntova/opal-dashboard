@@ -940,15 +940,36 @@ const PROSPECTIVE_SCHOOLS = [
 ];
 
 const ORGANIC_STATES = [
-  {name:'Colorado',      abbr:'CO', fips:'08', users:340, prev:298},
-  {name:'Ohio',          abbr:'OH', fips:'39', users:210, prev:187},
-  {name:'Idaho',         abbr:'ID', fips:'16', users:145, prev:156},
-  {name:'Utah',          abbr:'UT', fips:'49', users:290, prev:251},
-  {name:'South Carolina',abbr:'SC', fips:'45', users:178, prev:162},
-  {name:'Illinois',      abbr:'IL', fips:'17', users:320, prev:289},
-  {name:'Pennsylvania',  abbr:'PA', fips:'42', users:255, prev:271},
-  {name:'North Dakota',  abbr:'ND', fips:'38', users:87,  prev:71},
-  {name:'Arkansas',      abbr:'AR', fips:'05', users:134, prev:118},
+  {name:'Colorado',       abbr:'CO', fips:'08', users:340, prev:298, clusters:[{city:'Denver metro',users:198},{city:'Boulder',users:87},{city:'Colorado Springs',users:55}]},
+  {name:'Ohio',           abbr:'OH', fips:'39', users:210, prev:187, clusters:[{city:'Columbus',users:89},{city:'Cleveland',users:72},{city:'Cincinnati',users:49}]},
+  {name:'Idaho',          abbr:'ID', fips:'16', users:145, prev:156, clusters:[{city:'Boise',users:89},{city:'Idaho Falls',users:35},{city:'Coeur d'Alene',users:21}]},
+  {name:'Utah',           abbr:'UT', fips:'49', users:290, prev:251, clusters:[{city:'Salt Lake City',users:142},{city:'Provo',users:98},{city:'Ogden',users:50}]},
+  {name:'South Carolina', abbr:'SC', fips:'45', users:178, prev:162, clusters:[{city:'Charleston',users:73},{city:'Columbia',users:58},{city:'Greenville',users:47}]},
+  {name:'Illinois',       abbr:'IL', fips:'17', users:320, prev:289, clusters:[{city:'Chicago metro',users:198},{city:'Naperville',users:72},{city:'Evanston',users:50}]},
+  {name:'Pennsylvania',   abbr:'PA', fips:'42', users:255, prev:271, clusters:[{city:'Philadelphia',users:118},{city:'Pittsburgh',users:87},{city:'Harrisburg',users:50}]},
+  {name:'North Dakota',   abbr:'ND', fips:'38', users:87,  prev:71,  clusters:[{city:'Fargo',users:51},{city:'Bismarck',users:36}]},
+  {name:'Arkansas',       abbr:'AR', fips:'05', users:134, prev:118, clusters:[{city:'Little Rock',users:78},{city:'Fayetteville',users:56}]},
+  {name:'Georgia',        abbr:'GA', fips:'13', users:280, prev:251, clusters:[{city:'Atlanta metro',users:187},{city:'Savannah',users:54},{city:'Augusta',users:39}]},
+  {name:'North Carolina', abbr:'NC', fips:'37', users:195, prev:178, clusters:[{city:'Charlotte',users:91},{city:'Raleigh',users:67},{city:'Chapel Hill',users:37}]},
+  {name:'Arizona',        abbr:'AZ', fips:'04', users:312, prev:287, clusters:[{city:'Phoenix metro',users:198},{city:'Scottsdale',users:72},{city:'Tucson',users:42}]},
+  {name:'Nevada',         abbr:'NV', fips:'32', users:156, prev:141, clusters:[{city:'Las Vegas',users:98},{city:'Henderson',users:38},{city:'Reno',users:20}]},
+  {name:'Missouri',       abbr:'MO', fips:'29', users:223, prev:198, clusters:[{city:'St. Louis',users:112},{city:'Kansas City',users:78},{city:'Columbia',users:33}]},
+  {name:'Wisconsin',      abbr:'WI', fips:'55', users:167, prev:152, clusters:[{city:'Milwaukee',users:89},{city:'Madison',users:54},{city:'Green Bay',users:24}]},
+  {name:'Kentucky',       abbr:'KY', fips:'21', users:134, prev:119, clusters:[{city:'Louisville',users:72},{city:'Lexington',users:48},{city:'Bowling Green',users:14}]},
+  {name:'Indiana',        abbr:'IN', fips:'18', users:189, prev:172, clusters:[{city:'Indianapolis',users:103},{city:'Bloomington',users:52},{city:'Fort Wayne',users:34}]},
+  {name:'Louisiana',      abbr:'LA', fips:'22', users:108, prev:94,  clusters:[{city:'New Orleans',users:64},{city:'Baton Rouge',users:31},{city:'Shreveport',users:13}]},
+  {name:'Kansas',         abbr:'KS', fips:'20', users:124, prev:111, clusters:[{city:'Overland Park',users:67},{city:'Wichita',users:41},{city:'Lawrence',users:16}]},
+  {name:'Iowa',           abbr:'IA', fips:'19', users:98,  prev:87,  clusters:[{city:'Des Moines',users:55},{city:'Iowa City',users:30},{city:'Cedar Rapids',users:13}]},
+  {name:'Nebraska',       abbr:'NE', fips:'31', users:103, prev:91,  clusters:[{city:'Omaha',users:61},{city:'Lincoln',users:35},{city:'Bellevue',users:7}]},
+  {name:'Montana',        abbr:'MT', fips:'30', users:67,  prev:58,  clusters:[{city:'Billings',users:38},{city:'Missoula',users:29}]},
+  {name:'Wyoming',        abbr:'WY', fips:'56', users:45,  prev:38,  clusters:[{city:'Cheyenne',users:27},{city:'Casper',users:18}]},
+  {name:'Maine',          abbr:'ME', fips:'23', users:76,  prev:68,  clusters:[{city:'Portland',users:48},{city:'Bangor',users:28}]},
+  {name:'Vermont',        abbr:'VT', fips:'50', users:62,  prev:55,  clusters:[{city:'Burlington',users:39},{city:'Montpelier',users:23}]},
+  {name:'Rhode Island',   abbr:'RI', fips:'44', users:89,  prev:79,  clusters:[{city:'Providence',users:56},{city:'Newport',users:33}]},
+  {name:'Oklahoma',       abbr:'OK', fips:'40', users:143, prev:128, clusters:[{city:'Oklahoma City',users:81},{city:'Tulsa',users:44},{city:'Norman',users:18}]},
+  {name:'New Mexico',     abbr:'NM', fips:'35', users:112, prev:98,  clusters:[{city:'Albuquerque',users:67},{city:'Santa Fe',users:31},{city:'Las Cruces',users:14}]},
+  {name:'Alaska',         abbr:'AK', fips:'02', users:38,  prev:31,  clusters:[{city:'Anchorage',users:28},{city:'Fairbanks',users:10}]},
+  {name:'Hawaii',         abbr:'HI', fips:'15', users:52,  prev:44,  clusters:[{city:'Honolulu',users:38},{city:'Maui',users:14}]},
 ];
 
 const FIPS_NAMES = {
@@ -1640,7 +1661,7 @@ function renderAmbassadors() {
       <div class="amb-avatar confirmed">${u.name[0]}</div>
       <div class="amb-info">
         <div class="amb-name">${u.name} <span class="badge badge-ambassador">Ambassador</span></div>
-        <div class="amb-handle">${u.handle} ${u.grade ? `<span style="color:var(--text-tertiary);font-size:11px">· ${GRADE_LABELS[u.grade]}</span>` : ''}</div>
+        <div class="amb-handle">${u.handle} ${u.grade ? `<span style="color:var(--text-tertiary);font-size:11px">· Grade ${u.grade}</span>` : ''}</div>
         <div class="amb-school">${s.name} · ${s.city}, ${s.state}</div>
       </div>
       <div class="amb-metrics">
@@ -1660,7 +1681,7 @@ function renderAmbassadors() {
       <div class="amb-avatar candidate">${u.name[0]}</div>
       <div class="amb-info">
         <div class="amb-name">${u.name} <span class="badge" style="background:#DBEAFE;color:#1D4ED8;font-size:9px">Candidate</span></div>
-        <div class="amb-handle">${u.handle} ${u.grade ? `<span style="color:var(--text-tertiary);font-size:11px">· ${GRADE_LABELS[u.grade]}</span>` : ''}</div>
+        <div class="amb-handle">${u.handle} ${u.grade ? `<span style="color:var(--text-tertiary);font-size:11px">· Grade ${u.grade}</span>` : ''}</div>
         <div class="amb-school">${s.name} · ${s.city}, ${s.state} &nbsp;<span class="badge badge-${status}" style="font-size:9px">${STATUS_LABELS[status]}</span></div>
       </div>
       <div class="amb-metrics">
@@ -1673,29 +1694,67 @@ function renderAmbassadors() {
   }).join('');
 
   const readyCount = PROSPECTIVE_SCHOOLS.filter(s => prospectiveStatus(getWeekData(s).active) === 'ready').length;
+  const readySchools = PROSPECTIVE_SCHOOLS.filter(s => prospectiveStatus(getWeekData(s).active) === 'ready');
+
+  const confirmedListHTML = PARTNER_SCHOOLS.map(s => {
+    const u = s.users[0];
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="font-weight:500">${u.name}</span>
+      <span style="color:var(--text-tertiary)">${s.name}</span>
+    </div>`;
+  }).join('');
+
+  const candidateListHTML = PROSPECTIVE_SCHOOLS.map(s => {
+    const u = s.users[0];
+    const status = prospectiveStatus(getWeekData(s).active);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="font-weight:500">${u.name}</span>
+      <span style="color:var(--text-tertiary)">${s.name} &nbsp;<span class="badge badge-${status}" style="font-size:9px">${STATUS_LABELS[status]}</span></span>
+    </div>`;
+  }).join('');
+
+  const readyListHTML = readySchools.map(s => {
+    const {active} = getWeekData(s);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="font-weight:500">${s.name}</span>
+      <span style="color:var(--green);font-weight:600">${active} users</span>
+    </div>`;
+  }).join('');
 
   document.getElementById('ambassadors-content').innerHTML = `
     <div class="stats-bar" style="margin-bottom:24px">
-      <div class="stat-card">
-        <div class="stat-label">Confirmed Ambassadors</div>
+      <div class="stat-card clickable" onclick="toggleAmbStat('amb-stat-1')" style="cursor:pointer">
+        <div class="stat-label">Confirmed Ambassadors <span style="float:right;font-size:10px;color:var(--text-tertiary)" id="amb-chev-1">▼</span></div>
         <div class="stat-value">${PARTNER_SCHOOLS.length}</div>
         <div class="stat-sub">one per partner school</div>
+        <div id="amb-stat-1" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">${confirmedListHTML}</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Ambassador Candidates</div>
+      <div class="stat-card clickable" onclick="toggleAmbStat('amb-stat-2')" style="cursor:pointer">
+        <div class="stat-label">Ambassador Candidates <span style="float:right;font-size:10px;color:var(--text-tertiary)" id="amb-chev-2">▼</span></div>
         <div class="stat-value">${PROSPECTIVE_SCHOOLS.length}</div>
         <div class="stat-sub">top users at prospective schools</div>
+        <div id="amb-stat-2" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">${candidateListHTML}</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Schools Ready to Convert</div>
+      <div class="stat-card clickable" onclick="toggleAmbStat('amb-stat-3')" style="cursor:pointer">
+        <div class="stat-label">Schools Ready to Convert <span style="float:right;font-size:10px;color:var(--text-tertiary)" id="amb-chev-3">▼</span></div>
         <div class="stat-value" style="color:var(--green)">${readyCount}</div>
         <div class="stat-sub">≥100 active users</div>
+        <div id="amb-stat-3" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">${readyListHTML}</div>
       </div>
     </div>
     <div class="amb-section-lbl">Confirmed Ambassadors — Partner Schools</div>
     <div class="amb-grid">${confirmedHTML}</div>
     <div class="amb-section-lbl">Ambassador Candidates — Prospective Schools</div>
     <div class="amb-grid">${candidatesHTML}</div>`;
+}
+
+function toggleAmbStat(id) {
+  const el = document.getElementById(id);
+  const num = id.slice(-1);
+  const chev = document.getElementById('amb-chev-' + num);
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  if (chev) chev.textContent = open ? '▲' : '▼';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1761,12 +1820,19 @@ function buildPanel(fips) {
   if (prospects.length) html += `<div><div class="panel-section-title">Prospective Schools</div>${prospects.map(s=>panelSchoolHTML(s,'prospective')).join('')}</div>`;
   if (organic) {
     const up = organic.users > organic.prev, diff = Math.abs(organic.users-organic.prev);
+    const clustersHTML = organic.clusters ? organic.clusters.map(c =>
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--text-secondary)">${c.city}</span>
+        <span style="font-weight:600">${c.users.toLocaleString()}</span>
+      </div>`).join('') : '';
     html += `<div><div class="panel-section-title">Organic Activity</div>
       <div class="panel-organic-box">
         <div class="panel-organic-count">${organic.users.toLocaleString()}</div>
-        <div class="panel-organic-label">organic users this week</div>
+        <div class="panel-organic-label">high school aged users this week</div>
         <div style="margin-top:6px;font-size:12px;font-weight:500" class="${up?'trend-up':'trend-down'}">${up?'↑':'↓'} ${diff} vs last week</div>
-      </div></div>`;
+      </div>
+      ${clustersHTML ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-tertiary);margin-bottom:6px">By city</div>${clustersHTML}</div>` : ''}
+      </div>`;
   }
   if (cat === 'none') html = `<div class="panel-empty">No Opal activity detected here yet.</div>`;
   return html;
