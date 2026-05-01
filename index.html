@@ -307,6 +307,18 @@ header {
 .week-nav-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
 .week-nav-btn:disabled { opacity: 0.25; cursor: default; }
 
+/* ── ALERT STRIP ── */
+.alert-strip { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: var(--radius); padding: 12px 16px; margin-bottom: 14px; }
+.alert-strip-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9A3412; margin-bottom: 8px; }
+.alert-row { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; padding: 3px 0; color: var(--text); }
+.alert-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.alert-dot-red { background: #DC2626; }
+.alert-dot-amber { background: #F59E0B; }
+
+/* ── NEXT ACTION ── */
+.next-action-tag { display: inline-flex; align-items: center; padding: 2px 8px; background: #EEF2FF; color: #4338CA; border-radius: 20px; font-size: 10px; font-weight: 500; white-space: nowrap; }
+.next-action-wrap { margin-top: 14px; }
+
 /* ── PITCH MODAL ── */
 .pitch-modal-box {
   background: white; border-radius: 16px; width: 420px; max-width: 92vw;
@@ -609,6 +621,7 @@ header {
 
 <!-- PARTNER SCHOOLS -->
 <div id="view-partner" class="view active">
+  <div id="alert-strip"></div>
   <div class="stats-bar" id="partner-stats"></div>
   <div class="controls">
     <div class="controls-left">
@@ -1034,6 +1047,58 @@ function getNotes(school) {
 }
 
 // ══════════════════════════════════════════════════════════════
+// NEXT ACTION
+// ══════════════════════════════════════════════════════════════
+
+const NEXT_ACTION_LABELS = {
+  'schedule-qbr':  'Schedule QBR',
+  'check-in':      'Check-in email',
+  'pitch-email':   'Pitch email',
+  'follow-up':     'Follow up on intro',
+  'monitor':       'Monitor',
+};
+
+function getNextAction(id) {
+  const saved = lsLoad(id);
+  return (saved && saved.nextAction) ? saved.nextAction : '';
+}
+
+function saveNextAction(id, value) {
+  const saved = lsLoad(id) || {};
+  saved.nextAction = value;
+  lsSave(id, saved);
+  const el = document.getElementById('na-tag-' + id);
+  if (el) {
+    if (value) { el.textContent = '→ ' + NEXT_ACTION_LABELS[value]; el.style.display = 'inline-flex'; }
+    else { el.textContent = ''; el.style.display = 'none'; }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ALERT STRIP
+// ══════════════════════════════════════════════════════════════
+
+function renderAlerts() {
+  const el = document.getElementById('alert-strip');
+  if (!el) return;
+  const alerts = [];
+  PARTNER_SCHOOLS.forEach(s => {
+    const {active, prev} = getWeekData(s);
+    const status = partnerStatus(active);
+    if (status === 'at-risk') {
+      alerts.push({ dot: 'red', msg: `${s.name} is at risk — only ${active} active users this week.` });
+    } else if (prev !== null && (prev - active) >= 10) {
+      alerts.push({ dot: 'amber', msg: `${s.name} dropped ${prev - active} users from last week — worth a check-in.` });
+    }
+  });
+  if (alerts.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="alert-strip">
+    <div class="alert-strip-title">Attention needed</div>
+    ${alerts.map(a => `<div class="alert-row"><div class="alert-dot alert-dot-${a.dot}"></div><span>${a.msg}</span></div>`).join('')}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
 // CARD RENDERING
 // ══════════════════════════════════════════════════════════════
 
@@ -1084,6 +1149,17 @@ function contactsHTML(school) {
         <button class="btn-primary" onclick="event.stopPropagation(); saveNotes('${school.id}')">Save Notes</button>
         <span class="save-confirm" id="confirm-${school.id}">Saved ✓</span>
       </div>
+    </div>
+    <div class="next-action-wrap">
+      <div class="detail-section-title" style="margin-bottom:8px">Next Action</div>
+      <select class="field-input next-action-select" onclick="event.stopPropagation()" onchange="saveNextAction('${school.id}', this.value)">
+        <option value="" ${getNextAction(school.id)===''?'selected':''}>— Select next action —</option>
+        <option value="schedule-qbr" ${getNextAction(school.id)==='schedule-qbr'?'selected':''}>Schedule QBR</option>
+        <option value="check-in" ${getNextAction(school.id)==='check-in'?'selected':''}>Send check-in email</option>
+        <option value="pitch-email" ${getNextAction(school.id)==='pitch-email'?'selected':''}>Send pitch email</option>
+        <option value="follow-up" ${getNextAction(school.id)==='follow-up'?'selected':''}>Follow up on intro</option>
+        <option value="monitor" ${getNextAction(school.id)==='monitor'?'selected':''}>Monitor</option>
+      </select>
     </div>`;
 }
 
@@ -1118,7 +1194,7 @@ function renderCard(school, type) {
             <a class="card-website" href="${school.website}" target="_blank" onclick="event.stopPropagation()">↗ website</a>
             <button class="pitch-card-btn" onclick="openPitchCard('${school.id}',event)">${isPartner ? '📋 Impact' : '📄 Pitch'}</button>
           </div>
-          <div class="card-location">${school.city}, ${school.state}</div>
+          <div class="card-location">${school.city}, ${school.state} ${(()=>{const na=getNextAction(school.id);return na?`&nbsp;<span class="next-action-tag" id="na-tag-${school.id}">→ ${NEXT_ACTION_LABELS[na]}</span>`:`<span class="next-action-tag" id="na-tag-${school.id}" style="display:none"></span>`;})()}</div>
           <div class="card-ambassador-row">
             <span class="ambassador-star">⭐</span>
             <span class="ambassador-name">${topUser.name}</span>
@@ -1374,6 +1450,7 @@ function sortCards(type, mode, btn) {
 
 function renderPartner(mode = 'urgency') {
   partnerSort = mode;
+  renderAlerts();
   const total   = PARTNER_SCHOOLS.reduce((s,x)=>s+getWeekData(x).active,0);
   const healthy = PARTNER_SCHOOLS.filter(s=>partnerStatus(getWeekData(s).active)==='healthy').length;
   const atRisk  = PARTNER_SCHOOLS.filter(s=>partnerStatus(getWeekData(s).active)==='at-risk').length;
