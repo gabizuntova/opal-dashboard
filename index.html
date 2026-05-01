@@ -1516,7 +1516,13 @@ function clearFilter(type) {
 
 function urgencyOrder(school, type) {
   if (type === 'partner') { const s = partnerStatus(getWeekData(school).active); return s==='at-risk'?0:s==='moderate'?1:2; }
-  const s = prospectiveStatus(getWeekData(school).active); return s==='ready'?0:s==='close'?1:2;
+  // Prospective urgency: close first (needs a push), then ready (act on it), then not-ready
+  // Within each tier, declining momentum is more urgent than growing
+  const wd = getWeekData(school);
+  const s = prospectiveStatus(wd.active);
+  const declining = (wd.prev !== null && wd.active < wd.prev) ? 0 : 1;
+  const tier = s==='close'?0:s==='ready'?1:2;
+  return tier * 2 + declining;
 }
 function sortedSchools(schools, type, mode) {
   const arr = [...schools];
