@@ -587,6 +587,24 @@ header {
   </div>
 </div>
 
+<!-- OUTREACH MODAL -->
+<div class="modal-overlay" id="outreach-modal" onclick="closeModal('outreach-modal')">
+  <div onclick="event.stopPropagation()" style="background:var(--surface);border-radius:var(--radius);padding:28px;width:100%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,0.12);position:relative">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)" id="outreach-name"></div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px" id="outreach-meta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('outreach-modal')">✕</button>
+    </div>
+    <textarea id="outreach-msg" style="width:100%;box-sizing:border-box;min-height:160px;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:inherit;font-size:13px;line-height:1.6;color:var(--text);background:var(--bg);resize:vertical;outline:none"></textarea>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+      <button onclick="closeModal('outreach-modal')" style="padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:none;font-family:inherit;font-size:12px;cursor:pointer;color:var(--text-secondary)">Cancel</button>
+      <button onclick="copyOutreach()" style="padding:8px 16px;border:none;border-radius:6px;background:var(--text);color:white;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer" id="outreach-copy-btn">Copy message</button>
+    </div>
+  </div>
+</div>
+
 <!-- PITCH CARD MODAL -->
 <div class="modal-overlay" id="pitch-modal" onclick="closeModal('pitch-modal')">
   <div class="pitch-modal-box" onclick="event.stopPropagation()">
@@ -1869,7 +1887,7 @@ function renderAmbassadors(filter) {
       <div class="amb-row-meta">${user.grade ? 'Grade '+user.grade : ''} · ${user.handle}</div>
       <div class="amb-row-school">${school.name} <span style="color:var(--text-tertiary);font-size:11px">${school.city}, ${school.state}</span></div>
       <div>${badge}</div>
-      <button class="amb-contact-btn" onclick="event.stopPropagation();logContact('${user.name}')" title="Contact ${user.name}">✉ Contact</button>
+      <button class="amb-contact-btn" onclick="event.stopPropagation();openOutreach('${user.name}','${user.handle}','${school.name}','${type}')" title="Contact ${user.name}">✉ Contact</button>
     </div>`;
   }).join('');
 
@@ -1885,10 +1903,18 @@ function renderAmbassadors(filter) {
         <div class="stat-value">${PROSPECTIVE_SCHOOLS.length}</div>
         <div class="stat-sub">top users at prospective schools</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Schools Ready to Convert</div>
+      <div class="stat-card clickable" onclick="toggleAmbStat('amb-stat-3')" style="cursor:pointer">
+        <div class="stat-label">Schools Ready to Convert <span style="float:right;font-size:10px;color:var(--text-tertiary)" id="amb-chev-3">▼</span></div>
         <div class="stat-value" style="color:var(--green)">${readyCount}</div>
         <div class="stat-sub">≥100 active users</div>
+        <div id="amb-stat-3" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+          ${PROSPECTIVE_SCHOOLS.filter(s=>prospectiveStatus(getWeekData(s).active)==='ready').map(s=>`
+            <div onclick="event.stopPropagation();goToSchoolCard('${s.id}')" style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;border-radius:4px"
+              onmouseenter="this.style.background='var(--bg)'" onmouseleave="this.style.background=''">
+              <div><span style="font-weight:600">→ ${s.users[0].name}</span><span style="color:var(--text-tertiary);margin-left:8px;font-size:12px">${s.name}</span></div>
+              <span style="color:var(--green);font-size:11px;font-weight:600">READY</span>
+            </div>`).join('') || '<div style="font-size:12px;color:var(--text-tertiary);padding:6px 0">None yet.</div>'}
+        </div>
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
@@ -1899,16 +1925,29 @@ function renderAmbassadors(filter) {
     <div class="amb-list">${rowHTML || '<div style="color:var(--text-tertiary);font-size:13px;padding:16px">No results.</div>'}</div>`;
 }
 
-function logContact(name) {
-  const existing = document.getElementById('contact-toast');
-  if (existing) existing.remove();
-  const t = document.createElement('div');
-  t.id = 'contact-toast';
-  t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap';
-  t.textContent = `Outreach logged for ${name}`;
-  document.body.appendChild(t);
-  requestAnimationFrame(() => t.style.opacity = '1');
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 250); }, 2500);
+function copyHandle(handle) {
+  navigator.clipboard.writeText(handle).catch(()=>{});
+}
+
+function openOutreach(name, handle, schoolName, type) {
+  const firstName = name.split(' ')[0];
+  const isCandidate = type === 'candidate';
+  const msg = isCandidate
+    ? `Hi ${firstName},\n\nI'm reaching out on behalf of the Opal Ambassador Program. We noticed you're one of the most active Opal users at ${schoolName} — and that kind of engagement doesn't go unnoticed.\n\nWe'd love to have a quick chat about your experience with Opal and explore whether you'd be interested in helping bring it to more students at your school. You'd be a natural fit.\n\nWould you be open to connecting?\n\nBest,\n[Your name]`
+    : `Hi ${firstName},\n\nI'm reaching out from the Opal team. As one of the top ambassadors at ${schoolName}, your voice really matters in how we grow this community.\n\nI'd love to reconnect and hear how things are going — and share some exciting things we're working on for ambassadors this semester.\n\nWould you be up for a quick call?\n\nBest,\n[Your name]`;
+  document.getElementById('outreach-name').textContent = name + '  ' + handle;
+  document.getElementById('outreach-meta').textContent = schoolName + (isCandidate ? ' · Ambassador Candidate' : ' · Ambassador');
+  document.getElementById('outreach-msg').value = msg;
+  document.getElementById('outreach-copy-btn').textContent = 'Copy message';
+  document.getElementById('outreach-modal').classList.add('open');
+}
+
+function copyOutreach() {
+  const msg = document.getElementById('outreach-msg').value;
+  navigator.clipboard.writeText(msg).catch(()=>{});
+  const btn = document.getElementById('outreach-copy-btn');
+  btn.textContent = 'Copied ✓';
+  setTimeout(() => btn.textContent = 'Copy message', 2000);
 }
 
 function toggleAmbStat(id) {
