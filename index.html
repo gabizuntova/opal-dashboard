@@ -1929,6 +1929,23 @@ function copyHandle(handle) {
   navigator.clipboard.writeText(handle).catch(()=>{});
 }
 
+function goToAmbRow(schoolId, filter) {
+  const btn = [...document.querySelectorAll('.tab-btn')].find(b => (b.getAttribute('onclick')||'').includes("'ambassadors'"));
+  if (btn) switchView('ambassadors', btn);
+  setTimeout(() => {
+    renderAmbassadors(filter);
+    setTimeout(() => {
+      const row = document.querySelector(`.amb-row[onclick*="${schoolId}"]`);
+      if (row) {
+        row.scrollIntoView({behavior:'smooth', block:'center'});
+        row.style.transition = 'background 0.2s';
+        row.style.background = 'rgba(22,163,74,0.08)';
+        setTimeout(() => row.style.background = '', 1800);
+      }
+    }, 80);
+  }, 50);
+}
+
 function openOutreach(schoolId, userIdx, type) {
   const school = type === 'ambassador'
     ? PARTNER_SCHOOLS.find(s => s.id === schoolId)
@@ -1994,12 +2011,14 @@ function panelSchoolHTML(s, type) {
   const {active} = getWeekData(s);
   const status = type === 'partner' ? partnerStatus(active) : prospectiveStatus(active);
   const bg = type === 'prospective' ? 'background:#EFF6FF;border:1px solid #DBEAFE;' : '';
+  const isProspective = type === 'prospective';
   const usersHTML = s.users.map((u,i) => `
     <div class="panel-user-row" onclick="openProfile('${s.id}',${i})">
       <div class="panel-user-rank ${i===0?'panel-user-rank-1':''}">${i+1}</div>
-      <div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span class="panel-user-name">${u.name}</span>${i===0?' ⭐':''}
         <span class="panel-user-handle" style="margin-left:5px">${u.handle}</span>
+        ${i===0 ? `<span onclick="event.stopPropagation();goToAmbRow('${s.id}','${isProspective?'candidates':'ambassadors'}')" style="font-size:10px;color:var(--green);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px">→ Ambassadors</span>` : ''}
       </div>
     </div>`).join('');
   return `<div class="panel-school-item" id="psi-${s.id}">
