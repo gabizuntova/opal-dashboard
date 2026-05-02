@@ -570,6 +570,31 @@ header {
 .panel-organic-count { font-size: 28px; font-weight: 700; color: #7C3AED; letter-spacing: -1px; line-height: 1; }
 .panel-organic-label { font-size: 11px; color: #7C3AED; opacity: 0.8; margin-top: 2px; }
 .panel-empty { font-size: 13px; color: var(--text-tertiary); font-style: italic; }
+
+@media (max-width: 640px) {
+  .header-inner {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 10px 16px 6px;
+    row-gap: 4px;
+  }
+  .logo { order: 1; flex: 1; }
+  .week-nav { order: 2; }
+  .tabs {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { white-space: nowrap; padding: 5px 12px; font-size: 12px; }
+  .view { padding: 20px 16px; }
+  #view-map { height: calc(100vh - 90px); }
+  body { overflow-x: hidden; }
+}
 </style>
 </head>
 <body>
@@ -1750,15 +1775,24 @@ function renderOverview() {
   );
   const spW=200, spH=56;
   const spMin=Math.min(...weekTotals), spMax=Math.max(...weekTotals), spRange=spMax-spMin||1;
-  const spPts = weekTotals.map((v,i)=>`${(i/3*spW).toFixed(1)},${(spH-((v-spMin)/spRange)*(spH-28)-14).toFixed(1)}`).join(' ');
-  const spEndY = (spH-((weekTotals[3]-spMin)/spRange)*(spH-28)-14).toFixed(1);
+  const spCoords = weekTotals.map((v,i)=>({
+    x: parseFloat((i/3*spW).toFixed(1)),
+    y: parseFloat((spH-((v-spMin)/spRange)*(spH-28)-14).toFixed(1))
+  }));
+  const spPts = spCoords.map(p=>`${p.x},${p.y}`).join(' ');
+  const dotX = spCoords[selectedWeek].x;
+  const dotY = spCoords[selectedWeek].y;
+  const weekLabels = ['Apr 13','Apr 20','Apr 27','May 4–10'];
+  const labelHTML = weekLabels.map((l,i)=>
+    `<span style="${i===selectedWeek?'color:var(--green);font-weight:600':''}">${l}</span>`
+  ).join('');
   const sparkline = `<div style="display:flex;flex-direction:column;align-items:stretch;flex:1;min-width:200px">
     <svg width="100%" height="${spH}" style="display:block" viewBox="0 0 ${spW} ${spH}" preserveAspectRatio="none">
       <polyline points="${spPts}" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="${spW}" cy="${spEndY}" r="3" fill="var(--green)"/>
+      <circle cx="${dotX}" cy="${dotY}" r="3" fill="var(--green)"/>
     </svg>
     <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--text-tertiary)">
-      <span>Apr 13</span><span>Apr 20</span><span>Apr 27</span><span style="color:var(--green);font-weight:600">May 4–10</span>
+      ${labelHTML}
     </div>
   </div>`;
   document.getElementById('overview-stats').innerHTML = `
