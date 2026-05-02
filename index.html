@@ -1872,7 +1872,7 @@ function renderAmbassadors(filter) {
   const ambassadors = PARTNER_SCHOOLS.map(s => ({type:'ambassador', school:s, user:s.users[0], status:'ambassador'}));
   const candidates = PROSPECTIVE_SCHOOLS.map(s => ({
     type:'candidate', school:s, user:s.users[0], status:prospectiveStatus(getWeekData(s).active)
-  })).sort((a,b) => (statusOrder[a.status]||9) - (statusOrder[b.status]||9));
+  })).sort((a,b) => (statusOrder[a.status]??9) - (statusOrder[b.status]??9));
   const all = [...ambassadors, ...candidates];
   const filtered = filter==='ambassadors' ? ambassadors : filter==='candidates' ? candidates : all;
 
