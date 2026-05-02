@@ -1730,10 +1730,10 @@ function renderOverview() {
     + PROSPECTIVE_SCHOOLS.reduce((s,x)=>s+(x.history?x.history[w]:x.active),0)
     + ORGANIC_STATES.reduce((s,x)=>s+(x.history?x.history[w]:(w===3?x.users:x.prev||x.users)),0)
   );
-  const spW=200, spH=40;
+  const spW=200, spH=56;
   const spMin=Math.min(...weekTotals), spMax=Math.max(...weekTotals), spRange=spMax-spMin||1;
-  const spPts = weekTotals.map((v,i)=>`${(i/3*spW).toFixed(1)},${(spH-((v-spMin)/spRange)*(spH-6)-3).toFixed(1)}`).join(' ');
-  const spEndY = (spH-((weekTotals[3]-spMin)/spRange)*(spH-6)-3).toFixed(1);
+  const spPts = weekTotals.map((v,i)=>`${(i/3*spW).toFixed(1)},${(spH-((v-spMin)/spRange)*(spH-28)-14).toFixed(1)}`).join(' ');
+  const spEndY = (spH-((weekTotals[3]-spMin)/spRange)*(spH-28)-14).toFixed(1);
   const sparkline = `<div style="display:flex;flex-direction:column;align-items:stretch;flex:1;min-width:200px">
     <svg width="100%" height="${spH}" style="display:block" viewBox="0 0 ${spW} ${spH}" preserveAspectRatio="none">
       <polyline points="${spPts}" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
