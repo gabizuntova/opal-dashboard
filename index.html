@@ -1887,7 +1887,7 @@ function renderAmbassadors(filter) {
       <div class="amb-row-meta">${user.grade ? 'Grade '+user.grade : ''} · ${user.handle}</div>
       <div class="amb-row-school">${school.name} <span style="color:var(--text-tertiary);font-size:11px">${school.city}, ${school.state}</span></div>
       <div>${badge}</div>
-      <button class="amb-contact-btn" onclick="event.stopPropagation();openOutreach('${user.name}','${user.handle}','${school.name}','${type}')" title="Contact ${user.name}">✉ Contact</button>
+      <button class="amb-contact-btn" onclick="event.stopPropagation();openOutreach('${school.id}',0,'${type}')" title="Contact ${user.name}">✉ Contact</button>
     </div>`;
   }).join('');
 
@@ -1929,14 +1929,18 @@ function copyHandle(handle) {
   navigator.clipboard.writeText(handle).catch(()=>{});
 }
 
-function openOutreach(name, handle, schoolName, type) {
-  const firstName = name.split(' ')[0];
+function openOutreach(schoolId, userIdx, type) {
+  const school = type === 'ambassador'
+    ? PARTNER_SCHOOLS.find(s => s.id === schoolId)
+    : PROSPECTIVE_SCHOOLS.find(s => s.id === schoolId);
+  const user = school.users[userIdx || 0];
+  const firstName = user.name.split(' ')[0];
   const isCandidate = type === 'candidate';
   const msg = isCandidate
-    ? `Hi ${firstName},\n\nI'm reaching out on behalf of the Opal Ambassador Program. We noticed you're one of the most active Opal users at ${schoolName} — and that kind of engagement doesn't go unnoticed.\n\nWe'd love to have a quick chat about your experience with Opal and explore whether you'd be interested in helping bring it to more students at your school. You'd be a natural fit.\n\nWould you be open to connecting?\n\nBest,\n[Your name]`
-    : `Hi ${firstName},\n\nI'm reaching out from the Opal team. As one of the top ambassadors at ${schoolName}, your voice really matters in how we grow this community.\n\nI'd love to reconnect and hear how things are going — and share some exciting things we're working on for ambassadors this semester.\n\nWould you be up for a quick call?\n\nBest,\n[Your name]`;
-  document.getElementById('outreach-name').textContent = name + '  ' + handle;
-  document.getElementById('outreach-meta').textContent = schoolName + (isCandidate ? ' · Ambassador Candidate' : ' · Ambassador');
+    ? `Hi ${firstName},\n\nI'm reaching out on behalf of the Opal Ambassador Program. We noticed you're one of the most active Opal users at ${school.name} — and that kind of engagement doesn't go unnoticed.\n\nWe'd love to have a quick chat about your experience with Opal and explore whether you'd be interested in helping bring it to more students at your school. You'd be a natural fit.\n\nWould you be open to connecting?\n\nBest,\n[Your name]`
+    : `Hi ${firstName},\n\nI'm reaching out from the Opal team. As one of the top ambassadors at ${school.name}, your voice really matters in how we grow this community.\n\nI'd love to reconnect and hear how things are going — and share some exciting things we're working on for ambassadors this semester.\n\nWould you be up for a quick call?\n\nBest,\n[Your name]`;
+  document.getElementById('outreach-name').textContent = user.name + '  ' + user.handle;
+  document.getElementById('outreach-meta').textContent = school.name + (isCandidate ? ' · Ambassador Candidate' : ' · Ambassador');
   document.getElementById('outreach-msg').value = msg;
   document.getElementById('outreach-copy-btn').textContent = 'Copy message';
   document.getElementById('outreach-modal').classList.add('open');
